@@ -2,7 +2,10 @@ const {
   getTopics,
   getArticleById,
 } = require("./controllers/news.controllers.js");
-const { errorHandler } = require("./controllers/errors.controllers.js");
+const {
+  errorHandler,
+  psqlErrorHandler,
+} = require("./controllers/errors.controllers.js");
 const express = require("express");
 
 const app = express();
@@ -15,5 +18,6 @@ app.all("/*", (req, res) => {
 });
 
 app.use(errorHandler);
+app.use(psqlErrorHandler);
 
 module.exports = app;

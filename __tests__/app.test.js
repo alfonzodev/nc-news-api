@@ -4,6 +4,9 @@ const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed");
 
+// Utils
+const { convertTimestampToDate } = require("../db/seeds/utils.js");
+
 beforeEach(() => {
   return seed(data);
 });
@@ -39,15 +42,16 @@ describe("/api/articles/:article_id", () => {
         .expect(200)
         .then(({ body }) => {
           const { article } = body;
-          expect(article).toMatchObject({
-            article_id: expect.any(Number),
-            title: expect.any(String),
-            author: expect.any(String),
-            body: expect.any(String),
-            topic: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            article_img_url: expect.any(String),
+          expect(article).toEqual({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2020-07-09T20:11:00.000Z",
+            votes: 100,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           });
         });
     });
