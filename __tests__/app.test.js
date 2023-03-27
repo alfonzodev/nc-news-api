@@ -8,9 +8,13 @@ beforeEach(() => {
   return seed(data);
 });
 
+afterAll(() => {
+  return db.end();
+});
+
 describe("/api/topics", () => {
   describe("GET", () => {
-    test("responds with an array of all topic objects", () => {
+    test("200: responds with an array of all topic objects", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -27,7 +31,14 @@ describe("/api/topics", () => {
     });
   });
 });
-
-afterAll(() => {
-  return db.end();
+describe("Handle invalid endpoints", () => {
+  test("responds with 404 Not Found when provided an invalid endpoint", () => {
+    return request(app)
+      .get("/api/banana")
+      .expect(404)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Not found!");
+      });
+  });
 });
