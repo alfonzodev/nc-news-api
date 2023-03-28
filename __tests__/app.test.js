@@ -122,9 +122,18 @@ describe("/api/articles/:article_id/comments", () => {
               created_at: expect.any(String),
               author: expect.any(String),
               body: expect.any(String),
-              article_id: expect.any(Number),
+              article_id: 1,
             });
           });
+        });
+    });
+    test("200: responds with an empty array when given article_id is valid but the article has no comments", () => {
+      return request(app)
+        .get("/api/articles/8/comments")
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+          expect(comments).toEqual([]);
         });
     });
     test("404: responds with Not Found if article_id does not exist", () => {
