@@ -42,11 +42,7 @@ describe("/api/articles", () => {
           const { articles } = body;
           expect(articles.length).toBe(12);
           // Checking order by date
-          for (let i = 0; i < articles.length - 1; i++) {
-            currentDate = Date.parse(articles[i].created_at);
-            nextDate = Date.parse(articles[i + 1].created_at);
-            expect(currentDate > nextDate).toBe(true);
-          }
+          expect(articles).toBeSortedBy("created_at", { descending: true });
           // Checking object properties
           articles.forEach((article) => {
             expect(article).toMatchObject({
@@ -117,11 +113,7 @@ describe("/api/articles/:article_id/comments", () => {
           const { comments } = body;
           expect(comments.length).toBe(11);
           // Checking order
-          for (let i = 0; i < comments.length - 1; i++) {
-            currentDate = Date.parse(comments[i].created_at);
-            nextDate = Date.parse(comments[i + 1].created_at);
-            expect(currentDate > nextDate).toBe(true);
-          }
+          expect(comments).toBeSortedBy("created_at", { descending: true });
           // Checking object properties
           comments.forEach((comment) => {
             expect(comment).toMatchObject({
