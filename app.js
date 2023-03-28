@@ -1,6 +1,7 @@
 const {
   getTopics,
   getArticleById,
+  getArticles,
 } = require("./controllers/news.controllers.js");
 const {
   errorHandler,
@@ -11,6 +12,7 @@ const express = require("express");
 const app = express();
 
 app.get("/api/topics", getTopics);
+app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.all("/*", (req, res) => {

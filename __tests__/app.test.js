@@ -75,6 +75,39 @@ describe("/api/articles/:article_id", () => {
     });
   });
 });
+describe("/api/articles", () => {
+  describe("GET", () => {
+    test("200: responds with an array of articles containing all rows plus the comment_count ordered by date in descending order", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(12);
+          // Checking order by date
+          for (let i = 0; i < articles.length - 1; i++) {
+            currentDate = Date.parse(articles[i].created_at);
+            nextDate = Date.parse(articles[i + 1].created_at);
+            expect(currentDate > nextDate).toBe(true);
+          }
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("Handle invalid endpoints", () => {
   test("responds with 404 Not Found when provided an invalid endpoint", () => {
     return request(app)
