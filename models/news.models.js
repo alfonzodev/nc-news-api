@@ -19,7 +19,7 @@ const fetchArticlebyId = (article_id) => {
     });
 };
 
-const fetchArticles = () => {
+const fetchArticles = (article_id) => {
   return db.query(`
     SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.comment_id) AS comment_count 
     FROM articles 
@@ -29,4 +29,16 @@ const fetchArticles = () => {
   `);
 };
 
-module.exports = { fetchTopics, fetchArticlebyId, fetchArticles };
+const fetchCommentsByArticle = (article_id) => {
+  return db.query(
+    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC",
+    [article_id]
+  );
+};
+
+module.exports = {
+  fetchTopics,
+  fetchArticlebyId,
+  fetchArticles,
+  fetchCommentsByArticle,
+};

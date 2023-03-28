@@ -2,7 +2,10 @@ const {
   fetchTopics,
   fetchArticles,
   fetchArticlebyId,
+  fetchCommentsByArticle,
 } = require("../models/news.models.js");
+
+const { checkExists } = require("../models/utils.models.js");
 
 const getTopics = (req, res, next) => {
   fetchTopics()
@@ -14,6 +17,7 @@ const getTopics = (req, res, next) => {
       next(err);
     });
 };
+
 const getArticleById = (req, res, next) => {
   const { article_id } = req.params;
 
@@ -32,4 +36,24 @@ const getArticles = (req, res, next) => {
   });
 };
 
-module.exports = { getTopics, getArticles, getArticleById };
+const getCommentsByArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  Promise.all([
+    checkExists("articles", "article_id", article_id),
+    fetchCommentsByArticle(article_id),
+  ])
+    .then((promisesResult) => {
+      const comments = promisesResult[1].rows;
+      res.status(200).send({ comments });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = {
+  getTopics,
+  getArticles,
+  getArticleById,
+  getCommentsByArticleId,
+};
