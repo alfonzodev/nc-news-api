@@ -11,7 +11,7 @@ const fetchArticlebyId = (article_id) => {
       if (!data.rows.length) {
         return Promise.reject({
           status: 404,
-          msg: "Not Found - Article does not exist!",
+          msg: "Not Found: Article does not exist!",
         });
       } else {
         return data;
@@ -36,9 +36,17 @@ const fetchCommentsByArticle = (article_id) => {
   );
 };
 
+const insertComment = (article_id, comment) => {
+  return db.query(
+    "INSERT INTO comments(body, article_id, author) VALUES ($1, $2, $3) RETURNING *",
+    [comment.body, article_id, comment.username]
+  );
+};
+
 module.exports = {
   fetchTopics,
   fetchArticlebyId,
   fetchArticles,
   fetchCommentsByArticle,
+  insertComment,
 };
