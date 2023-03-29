@@ -155,9 +155,6 @@ describe("/api/articles/:article_id/comments", () => {
         });
     });
   });
-});
-
-describe("/api/articles/:article_id/comments", () => {
   describe("POST", () => {
     test("201: responds with the created comment when req body contains a comment object with username and body", () => {
       const testComment = {
@@ -202,7 +199,7 @@ describe("/api/articles/:article_id/comments", () => {
           });
         });
     });
-    test("400: responds with Not Found when provided a non-existing article_id", () => {
+    test("404: responds with Not Found when provided a non-existing article_id", () => {
       const testComment = {
         username: "lurker",
         body: "This is the best article I've read thus far.",
@@ -210,10 +207,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/300/comments")
         .send(testComment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid article id!");
+          expect(msg).toBe("Not Found: article_id does not exist.");
         });
     });
     test("400: responds with Bad Request when provided an invalid article_id", () => {
@@ -230,7 +227,7 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("Invalid article id!");
         });
     });
-    test("400: responds with Not Found when username in request body does not exist", () => {
+    test("404: responds with Not Found when username in request body does not exist", () => {
       const testComment = {
         username: "fakeUsername",
         body: "This is the best article I've read thus far.",
@@ -238,10 +235,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/8/comments")
         .send(testComment)
-        .expect(400)
+        .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid username!");
+          expect(msg).toBe("Not Found: username does not exist.");
         });
     });
     test("400: responds with Bad Request when NO username is provided in request body", () => {
