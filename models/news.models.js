@@ -37,6 +37,11 @@ const fetchCommentsByArticle = (article_id) => {
 };
 
 const insertComment = (article_id, comment) => {
+  if (!comment.hasOwnProperty("username") || !comment.hasOwnProperty("body")) {
+    return Promise.reject({ status: 400, msg: "Error: missing information." });
+  } else if (comment.body === "") {
+    return Promise.reject({ status: 400, msg: "Error: empty comment." });
+  }
   return db.query(
     "INSERT INTO comments(body, article_id, author) VALUES ($1, $2, $3) RETURNING *",
     [comment.body, article_id, comment.username]
