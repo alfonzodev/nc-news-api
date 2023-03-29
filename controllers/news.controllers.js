@@ -54,25 +54,12 @@ const postComment = (req, res, next) => {
   const { article_id } = req.params;
   const comment = req.body;
 
-  if (!comment.hasOwnProperty("username") || !comment.hasOwnProperty("body")) {
-    next({ status: 400, msg: "Error: missing information." });
-  } else if (comment.body === "") {
-    next({ status: 400, msg: "Error: empty comment." });
-  }
-
-  Promise.all([
-    checkExists("articles", "article_id", article_id),
-    checkExists("users", "username", comment.username),
-  ])
-    .then(() => {
-      return insertComment(article_id, comment);
-    })
+  insertComment(article_id, comment)
     .then((data) => {
       const comment = data.rows[0];
       res.status(201).send({ comment });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };
