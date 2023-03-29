@@ -51,7 +51,7 @@ const insertComment = (article_id, comment) => {
 const updateArticleVoteCount = (article_id, incrementVote) => {
   if (!incrementVote.hasOwnProperty("inc_votes")) {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
-  }else if(isNaN())
+  }
 
   return db.query(
       "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *",
