@@ -11,7 +11,7 @@ const fetchArticlebyId = (article_id) => {
       if (!data.rows.length) {
         return Promise.reject({
           status: 404,
-          msg: "Not Found: Article does not exist!",
+          msg: "Not found: article_id does not exist!",
         });
       } else {
         return data;
@@ -48,10 +48,32 @@ const insertComment = (article_id, comment) => {
   );
 };
 
+const updateArticleVoteCount = (article_id, incrementVote) => {
+  if (!incrementVote.hasOwnProperty("inc_votes")) {
+    return Promise.reject({ status: 400, msg: "Error: missing information." });
+  }else if(isNaN())
+
+  return db.query(
+      "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *",
+      [incrementVote.inc_votes, article_id]
+    )
+    .then((data) => {
+      if (!data.rows.length) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not found: article_id does not exist!",
+        });
+      } else {
+        return data;
+      }
+    });
+};
+
 module.exports = {
   fetchTopics,
   fetchArticlebyId,
   fetchArticles,
   fetchCommentsByArticle,
   insertComment,
+  updateArticleVoteCount,
 };

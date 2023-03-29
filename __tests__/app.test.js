@@ -88,7 +88,7 @@ describe("/api/articles/:article_id", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not Found: Article does not exist!");
+          expect(msg).toBe("Not found: article_id does not exist!");
         });
     });
     test("400: responds with Bad Request when article id is not valid", () => {
@@ -97,7 +97,95 @@ describe("/api/articles/:article_id", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid article id!");
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+  });
+  describe("PATCH", () => {
+    test("200: responds with updated article object with the votes incremented by the amount defined in inc_votes", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(testIncVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { updatedArticle } = body;
+          expect(updatedArticle).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: expect.any(String),
+            votes: 110,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    test("200: responds with updated article object with the votes decremented by the amount defined in inc_votes", () => {
+      const testIncVotes = { inc_votes: -10 };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(testIncVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { updatedArticle } = body;
+          expect(updatedArticle).toMatchObject({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: expect.any(String),
+            votes: 90,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          });
+        });
+    });
+    test("400: responds with Bad Request when article_id is invalid", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/articles/not-a-num")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("404: responds with Bad Request when article_id does not exist", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/articles/9999")
+        .send(testIncVotes)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not found: article_id does not exist!");
+        });
+    });
+    test("400: responds with Bad Request when req body does not contain inc_votes property", () => {
+      const testIncVotes = {};
+      return request(app)
+        .patch("/api/articles/1")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when req body inc_votes property contains wrong data type", () => {
+      const testIncVotes = { inc_votes: "wrong-data-format" };
+      return request(app)
+        .patch("/api/articles/1")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
         });
     });
   });
@@ -138,7 +226,7 @@ describe("/api/articles/:article_id/comments", () => {
     });
     test("404: responds with Not Found if article_id does not exist", () => {
       return request(app)
-        .get("/api/articles/300/comments")
+        .get("/api/articles/9999/comments")
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
@@ -151,7 +239,7 @@ describe("/api/articles/:article_id/comments", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid article id!");
+          expect(msg).toBe("Error: invalid data format.");
         });
     });
   });
@@ -205,7 +293,7 @@ describe("/api/articles/:article_id/comments", () => {
         body: "This is the best article I've read thus far.",
       };
       return request(app)
-        .post("/api/articles/300/comments")
+        .post("/api/articles/9999/comments")
         .send(testComment)
         .expect(404)
         .then(({ body }) => {
@@ -224,7 +312,7 @@ describe("/api/articles/:article_id/comments", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Invalid article id!");
+          expect(msg).toBe("Error: invalid data format.");
         });
     });
     test("404: responds with Not Found when username in request body does not exist", () => {
