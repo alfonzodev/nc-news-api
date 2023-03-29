@@ -88,7 +88,7 @@ describe("/api/articles/:article_id", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not Found - Article does not exist!");
+          expect(msg).toBe("Not Found: Article does not exist!");
         });
     });
     test("400: responds with Bad Request when article id is not valid", () => {
@@ -152,6 +152,133 @@ describe("/api/articles/:article_id/comments", () => {
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Invalid article id!");
+        });
+    });
+  });
+  describe("POST", () => {
+    test("201: responds with the created comment when req body contains a comment object with username and body", () => {
+      const testComment = {
+        username: "lurker",
+        body: "This is the best article I've read thus far.",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: testComment.body,
+            article_id: 8,
+            author: testComment.username,
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("201: responds with the created comment when req body contains a comment object with username, body and extra properties", () => {
+      const testComment = {
+        username: "lurker",
+        body: "This is the best article I've read thus far.",
+        extra_property: "This is an extra, invalid, property",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: testComment.body,
+            article_id: 8,
+            author: testComment.username,
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("404: responds with Not Found when provided a non-existing article_id", () => {
+      const testComment = {
+        username: "lurker",
+        body: "This is the best article I've read thus far.",
+      };
+      return request(app)
+        .post("/api/articles/300/comments")
+        .send(testComment)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: article_id does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when provided an invalid article_id", () => {
+      const testComment = {
+        username: "lurker",
+        body: "This is the best article I've read thus far.",
+      };
+      return request(app)
+        .post("/api/articles/not-a-number/comments")
+        .send(testComment)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Invalid article id!");
+        });
+    });
+    test("404: responds with Not Found when username in request body does not exist", () => {
+      const testComment = {
+        username: "fakeUsername",
+        body: "This is the best article I've read thus far.",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: username does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when NO username is provided in request body", () => {
+      const testComment = {
+        body: "This is the best article I've read thus far.",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when comment body in request body is an empty string", () => {
+      const testComment = {
+        username: "lurker",
+        body: "",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: empty comment.");
+        });
+    });
+    test("400: responds with Bad Request when NO comment body is provided in request body", () => {
+      const testComment = {
+        username: "lurker",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
         });
     });
   });
