@@ -159,7 +159,7 @@ describe("/api/articles/:article_id/comments", () => {
 
 describe("/api/articles/:article_id/comments", () => {
   describe("POST", () => {
-    test("201: responds with the created comment", () => {
+    test("201: responds with the created comment when req body contains a comment object with username and body", () => {
       const testComment = {
         username: "lurker",
         body: "This is the best article I've read thus far.",
@@ -180,7 +180,29 @@ describe("/api/articles/:article_id/comments", () => {
           });
         });
     });
-    test("404: responds with Not Found when provided a non-existing article_id", () => {
+    test("201: responds with the created comment when req body contains a comment object with username, body and extra properties", () => {
+      const testComment = {
+        username: "lurker",
+        body: "This is the best article I've read thus far.",
+        extra_property: "This is an extra, invalid, property",
+      };
+      return request(app)
+        .post("/api/articles/8/comments")
+        .send(testComment)
+        .expect(201)
+        .then(({ body }) => {
+          const { comment } = body;
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: testComment.body,
+            article_id: 8,
+            author: testComment.username,
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("400: responds with Not Found when provided a non-existing article_id", () => {
       const testComment = {
         username: "lurker",
         body: "This is the best article I've read thus far.",
@@ -188,10 +210,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/300/comments")
         .send(testComment)
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not Found: article_id does not exist.");
+          expect(msg).toBe("Invalid article id!");
         });
     });
     test("400: responds with Bad Request when provided an invalid article_id", () => {
@@ -208,7 +230,7 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("Invalid article id!");
         });
     });
-    test("404: responds with Not Found when username in request body does not exist", () => {
+    test("400: responds with Not Found when username in request body does not exist", () => {
       const testComment = {
         username: "fakeUsername",
         body: "This is the best article I've read thus far.",
@@ -216,10 +238,10 @@ describe("/api/articles/:article_id/comments", () => {
       return request(app)
         .post("/api/articles/8/comments")
         .send(testComment)
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not Found: username does not exist.");
+          expect(msg).toBe("Invalid username!");
         });
     });
     test("400: responds with Bad Request when NO username is provided in request body", () => {
