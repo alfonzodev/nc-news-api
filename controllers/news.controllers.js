@@ -4,6 +4,7 @@ const {
   fetchArticlebyId,
   fetchCommentsByArticle,
   insertComment,
+  updateArticleVoteCount,
 } = require("../models/news.models.js");
 
 const { checkExists } = require("../models/utils.models.js");
@@ -64,10 +65,24 @@ const postComment = (req, res, next) => {
     });
 };
 
+const patchVoteCount = (req, res, next) => {
+  const { article_id } = req.params;
+  const incrementVote = req.body;
+  updateArticleVoteCount(article_id, incrementVote)
+    .then((data) => {
+      const updatedArticle = data.rows[0];
+      res.status(200).send({ updatedArticle });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 module.exports = {
   getTopics,
   getArticles,
   getArticleById,
   getCommentsByArticleId,
   postComment,
+  patchVoteCount,
 };

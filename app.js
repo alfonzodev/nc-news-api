@@ -4,6 +4,7 @@ const {
   getArticles,
   getCommentsByArticleId,
   postComment,
+  patchVoteCount,
 } = require("./controllers/news.controllers.js");
 const {
   errorHandler,
@@ -19,6 +20,8 @@ app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
+
+app.patch("/api/articles/:article_id", patchVoteCount);
 
 app.post("/api/articles/:article_id/comments", postComment);
 

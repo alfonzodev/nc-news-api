@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
 };
 const psqlErrorHandler = (err, req, res, next) => {
   if (err.code === "22P02") {
-    res.status(400).send({ msg: "Invalid article id!" });
+    res.status(400).send({ msg: "Error: invalid data format." });
   }
   if (err.code === "23503" && err.constraint === "comments_author_fkey") {
     res.status(404).send({ msg: "Not Found: username does not exist." });
