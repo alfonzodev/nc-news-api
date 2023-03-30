@@ -231,7 +231,7 @@ describe("/api/articles/:article_id", () => {
         .expect(200)
         .then(({ body }) => {
           const { article } = body;
-          expect(article).toEqual({
+          expect(article).toMatchObject({
             article_id: 1,
             title: "Living in the shadow of a great man",
             author: "butter_bridge",
@@ -239,10 +239,20 @@ describe("/api/articles/:article_id", () => {
             topic: "mitch",
             created_at: "2020-07-09T20:11:00.000Z",
             votes: 100,
-            comment_count: "11",
             article_img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           });
+        });
+    });
+    test("200: responds with an article object with a comment_count property", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toEqual(
+            expect.objectContaining({ comment_count: "11" })
+          );
         });
     });
     test("404: responds with Not Found when article id does not exist", () => {
