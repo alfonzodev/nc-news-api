@@ -10,8 +10,9 @@ const {
 
 const { getUsers } = require("./controllers/users.controllers.js");
 const {
-  errorHandler,
+  errorHandlerCustom,
   psqlErrorHandler,
+  errorHandler500Status,
 } = require("./controllers/errors.controllers.js");
 const express = require("express");
 
@@ -35,7 +36,8 @@ app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not found!" });
 });
 
-app.use(errorHandler);
+app.use(errorHandlerCustom);
 app.use(psqlErrorHandler);
+app.use(errorHandler500Status);
 
 module.exports = app;

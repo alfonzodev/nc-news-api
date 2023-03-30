@@ -19,14 +19,53 @@ const fetchArticlebyId = (article_id) => {
     });
 };
 
-const fetchArticles = (article_id) => {
-  return db.query(`
+const fetchArticles = (sort_by, order, topic) => {
+  const validSortQueries = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  let queryStr = `
     SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.comment_id) AS comment_count 
     FROM articles 
     LEFT JOIN comments ON articles.article_id = comments.article_id 
-    GROUP BY articles.article_id 
-    ORDER BY created_at DESC
-  `);
+  `;
+
+  const queryParams = [];
+
+  // Including topic in sql query
+  if (topic) {
+    queryStr += ` WHERE topic = $1`;
+    queryParams.push(topic);
+  }
+
+  queryStr += " GROUP BY articles.article_id";
+
+  // Validating and including sort_by
+  if (validSortQueries.includes(sort_by)) {
+    queryStr += ` ORDER BY ${sort_by}`;
+  } else {
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${sort_by}.`,
+    });
+  }
+
+  // validating and including order
+  if (order === "asc" || order === "desc") {
+    queryStr += ` ${order.toUpperCase()}`;
+  } else {
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${order}.`,
+    });
+  }
+
+  return db.query(queryStr, queryParams);
 };
 
 const fetchCommentsByArticle = (article_id) => {

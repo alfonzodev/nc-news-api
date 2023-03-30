@@ -1,4 +1,4 @@
-const errorHandler = (err, req, res, next) => {
+const errorHandlerCustom = (err, req, res, next) => {
   if (err.status && err.msg) {
     res.status(err.status).send({ msg: err.msg });
   }
@@ -17,4 +17,12 @@ const psqlErrorHandler = (err, req, res, next) => {
   next(err);
 };
 
-module.exports = { errorHandler, psqlErrorHandler };
+const errorHandler500Status = (err, req, res, next) => {
+  res.status(500).send({ msg: err });
+};
+
+module.exports = {
+  errorHandlerCustom,
+  psqlErrorHandler,
+  errorHandler500Status,
+};

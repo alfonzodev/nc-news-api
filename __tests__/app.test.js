@@ -55,7 +55,7 @@ describe("/api/users", () => {
 
 describe("/api/articles", () => {
   describe("GET", () => {
-    test("200: responds with an array of articles containing all rows plus the comment_count ordered by date in descending order", () => {
+    test("200: responds with an array of articles containing all rows plus the comment_count ordered by date in descending order when no queries are provided", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -77,6 +77,147 @@ describe("/api/articles", () => {
               comment_count: expect.any(String),
             });
           });
+        });
+    });
+    test("200: responds with an array of articles ordered by date in ascending order", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(12);
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { ascending: true });
+        });
+    });
+    test("200: responds with an array of articles filtered by the provided topic", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(11);
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "mitch",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+    test("200: responds with an array of articles sorted by the provided column in descending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(12);
+          // Checking order by date
+          expect(articles).toBeSortedBy("author", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+    test("200: responds with an array of articles sorted by the provided column in ascending order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(12);
+          // Checking order by date
+          expect(articles).toBeSortedBy("author", { ascending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+    test("200: responds with an array of articles filtered by the provided topic and sorted by the provided column in ascending order", () => {
+      return request(app)
+        .get("/api/articles?topic=mitch&sort_by=author&order=asc")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(11);
+          // Checking order by date
+          expect(articles).toBeSortedBy("author", { ascending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: "mitch",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+    });
+    test("200: responds with an empty array when topic exists but no articles have the specified topic", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toEqual([]);
+        });
+    });
+    test("404: responds with Not Found when topic query does not exist", () => {
+      return request(app)
+        .get("/api/articles?topic=fake-topic")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: slug does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when sort_by query has invalid column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=invalid-col")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Invalid query - invalid-col.");
+        });
+    });
+    test("400: responds with Bad Request when order query has invalid value", () => {
+      return request(app)
+        .get("/api/articles?order=random")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Invalid query - random.");
         });
     });
   });
