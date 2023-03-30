@@ -5,6 +5,7 @@ const {
   getCommentsByArticleId,
   postComment,
   patchVoteCount,
+  deleteComment
 } = require("./controllers/news.controllers.js");
 const {
   errorHandler,
@@ -24,6 +25,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.patch("/api/articles/:article_id", patchVoteCount);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not found!" });

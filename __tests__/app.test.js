@@ -191,6 +191,32 @@ describe("/api/articles/:article_id", () => {
   });
 });
 
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("204: responds with no content when successfully deleted comment by id", () => {
+      return request(app).delete("/api/comments/1").expect(204);
+    });
+    test("404: responds with Not Found when comment_id does not exist", () => {
+      return request(app)
+        .delete("/api/comments/9999")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: comment_id does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when comment_id is invalid", () => {
+      return request(app)
+        .delete("/api/comments/not-a-num")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+  });
+});
+
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
     test("200: responds with an array of comments for the given article_id ordered by creation date in descending order", () => {

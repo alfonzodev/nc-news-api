@@ -5,6 +5,7 @@ const {
   fetchCommentsByArticle,
   insertComment,
   updateArticleVoteCount,
+  deleteCommentById,
 } = require("../models/news.models.js");
 
 const { checkExists } = require("../models/utils.models.js");
@@ -78,6 +79,17 @@ const patchVoteCount = (req, res, next) => {
     });
 };
 
+const deleteComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  deleteCommentById(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 module.exports = {
   getTopics,
   getArticles,
@@ -85,4 +97,5 @@ module.exports = {
   getCommentsByArticleId,
   postComment,
   patchVoteCount,
+  deleteComment,
 };
