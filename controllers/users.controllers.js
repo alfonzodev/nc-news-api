@@ -3,7 +3,6 @@ const { fetchUsers } = require("../models/users.models.js");
 const getUsers = (req, res, next) => {
   fetchUsers()
     .then((data) => {
-      console.log(data.rows);
       const users = data.rows;
       res.status(200).send({ users });
     })

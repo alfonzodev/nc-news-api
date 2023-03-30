@@ -40,6 +40,7 @@ describe("/api/users", () => {
         .expect(200)
         .then(({ body }) => {
           const { users } = body;
+          expect(users.length).toBe(4);
           users.forEach((user) => {
             expect(user).toMatchObject({
               username: expect.any(String),
