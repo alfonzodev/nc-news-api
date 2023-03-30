@@ -184,13 +184,22 @@ describe("/api/articles", () => {
           });
         });
     });
+    test("200: responds with an empty array when topic exists but no articles have the specified topic", () => {
+      return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toEqual([]);
+        });
+    });
     test("404: responds with Not Found when topic query does not exist", () => {
       return request(app)
         .get("/api/articles?topic=fake-topic")
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not Found: topic does not exist.");
+          expect(msg).toBe("Not Found: slug does not exist.");
         });
     });
     test("400: responds with Bad Request when sort_by query has invalid column", () => {

@@ -35,7 +35,7 @@ const getArticles = (req, res, next) => {
 
   const articlesPromises = [fetchArticles(sort_by, order, topic)];
 
-  if (topic) articlesPromises.push(checkExists("articles", "topic", topic));
+  if (topic) articlesPromises.push(checkExists("topics", "slug", topic));
 
   Promise.all(articlesPromises)
     .then((promisesResult) => {
