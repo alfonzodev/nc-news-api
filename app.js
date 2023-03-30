@@ -5,8 +5,10 @@ const {
   getCommentsByArticleId,
   postComment,
   patchVoteCount,
-  deleteComment
+  deleteComment,
 } = require("./controllers/news.controllers.js");
+
+const { getUsers } = require("./controllers/users.controllers.js");
 const {
   errorHandler,
   psqlErrorHandler,
@@ -19,6 +21,7 @@ app.use(express.json());
 
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
+app.get("/api/users", getUsers);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 

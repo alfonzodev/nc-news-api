@@ -32,6 +32,26 @@ describe("/api/topics", () => {
   });
 });
 
+describe("/api/users", () => {
+  describe("GET", () => {
+    test("200: responds with an array of user objects with 'username', 'name' and 'avatar_url' properties", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body }) => {
+          const { users } = body;
+          users.forEach((user) => {
+            expect(user).toMatchObject({
+              username: expect.any(String),
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("/api/articles", () => {
   describe("GET", () => {
     test("200: responds with an array of articles containing all rows plus the comment_count ordered by date in descending order", () => {
