@@ -31,9 +31,15 @@ const getArticleById = (req, res, next) => {
 };
 
 const getArticles = (req, res, next) => {
-  fetchArticles()
-    .then((data) => {
-      const articles = data.rows;
+  const { sort_by = "created_at", order = "desc", topic } = req.query;
+
+  const articlesPromises = [fetchArticles(sort_by, order, topic)];
+
+  if (topic) articlesPromises.push(checkExists("articles", "topic", topic));
+
+  Promise.all(articlesPromises)
+    .then((promisesResult) => {
+      const articles = promisesResult[0].rows;
       res.status(200).send({ articles });
     })
     .catch((err) => next(err));
