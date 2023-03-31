@@ -67,13 +67,15 @@
     "exampleResponse": {
       "comments": [
         {
+          "comment_id": 1,
           "body": "Very nice!",
           "votes": 2,
-          "author": "butter_bridge",
+          "author": "weegembump",
           "article_id": 1,
           "created_at": 1586179020000
         },
         {
+          "comment_id": 2,
           "body": "Best article I have read!",
           "votes": 3,
           "author": "solitary_reader",
@@ -91,11 +93,26 @@
     },
     "exampleResponse": {
       "comment": {
+        "comment_id": 3,
         "body": "This is a new comment!",
         "votes": 0,
         "author": "king_of_comments",
         "article_id": 1,
         "created_at": 1586179023210
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "increments/decrements comment votes by amount defined in passed object",
+    "exampleRequestBody": { "inc_votes": 10 },
+    "exampleResponse": {
+      "updatedComment": {
+        "comment_id": 1,
+        "body": "Very nice!",
+        "votes": 12,
+        "author": "weegembump",
+        "article_id": 1,
+        "created_at": 1586179020000
       }
     }
   },
@@ -122,6 +139,19 @@
           "username": "solitary_reader",
           "name": "Emma",
           "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        }
+      ]
+    }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user object",
+    "queries": [],
+    "exampleResponse": {
+      "user": [
+        {
+          "username": "weegembump",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
       ]
     }
