@@ -431,6 +431,88 @@ describe("/api/comments/:comment_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("200: responds with updated comment object with the votes incremented by the amount defined in inc_votes", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(testIncVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { updatedComment } = body;
+          expect(updatedComment).toMatchObject({
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            votes: 26,
+            author: "butter_bridge",
+            article_id: 9,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("200: responds with updated comment object with the votes decremented by the amount defined in inc_votes", () => {
+      const testIncVotes = { inc_votes: -20 };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(testIncVotes)
+        .expect(200)
+        .then(({ body }) => {
+          const { updatedComment } = body;
+          expect(updatedComment).toMatchObject({
+            comment_id: 1,
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            votes: -4,
+            author: "butter_bridge",
+            article_id: 9,
+            created_at: expect.any(String),
+          });
+        });
+    });
+    test("400: responds with Bad Request when comment_id is invalid", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/comments/not-a-num")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("404: responds with Not Found when comment_id does not exist", () => {
+      const testIncVotes = { inc_votes: 10 };
+      return request(app)
+        .patch("/api/comments/9999")
+        .send(testIncVotes)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: comment_id does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when req body does not contain inc_votes property", () => {
+      const testIncVotes = {};
+      return request(app)
+        .patch("/api/comments/1")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when req body inc_votes property contains wrong data type", () => {
+      const testIncVotes = { inc_votes: "wrong-data-format" };
+      return request(app)
+        .patch("/api/comments/1")
+        .send(testIncVotes)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {

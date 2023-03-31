@@ -2,6 +2,7 @@ const {
   fetchCommentsByArticle,
   insertComment,
   deleteCommentById,
+  updateCommentVotes,
 } = require("../models/comments.models.js");
 
 const { checkExists } = require("../models/utils.models.js");
@@ -44,4 +45,20 @@ const deleteComment = (req, res, next) => {
     });
 };
 
-module.exports = { getCommentsByArticleId, postComment, deleteComment };
+const patchCommentVotes = (req, res, next) => {
+  const incVotes = req.body;
+  const { comment_id } = req.params;
+  updateCommentVotes(incVotes, comment_id)
+    .then((data) => {
+      const updatedComment = data.rows[0];
+      res.status(200).send({ updatedComment });
+    })
+    .catch((err) => next(err));
+};
+
+module.exports = {
+  getCommentsByArticleId,
+  postComment,
+  deleteComment,
+  patchCommentVotes,
+};

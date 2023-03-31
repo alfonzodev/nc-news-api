@@ -33,4 +33,29 @@ const deleteCommentById = (comment_id) => {
     });
 };
 
-module.exports = { fetchCommentsByArticle, insertComment, deleteCommentById };
+const updateCommentVotes = (incrementVotes, comment_id) => {
+  if (!incrementVotes.hasOwnProperty("inc_votes")) {
+    return Promise.reject({ status: 400, msg: "Error: missing information." });
+  }
+  return db
+    .query(
+      "UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *",
+      [incrementVotes.inc_votes, comment_id]
+    )
+    .then((data) => {
+      if (data.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not Found: comment_id does not exist.",
+        });
+      }
+      return data;
+    });
+};
+
+module.exports = {
+  fetchCommentsByArticle,
+  insertComment,
+  deleteCommentById,
+  updateCommentVotes,
+};
