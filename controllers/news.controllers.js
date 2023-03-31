@@ -8,7 +8,13 @@ const {
   deleteCommentById,
 } = require("../models/news.models.js");
 
+const endpoints = require("../endpoints.json");
+
 const { checkExists } = require("../models/utils.models.js");
+
+const getEndpoints = (req, res) => {
+  res.status(200).send(endpoints);
+};
 
 const getTopics = (req, res, next) => {
   fetchTopics()
@@ -97,6 +103,7 @@ const deleteComment = (req, res, next) => {
 };
 
 module.exports = {
+  getEndpoints,
   getTopics,
   getArticles,
   getArticleById,

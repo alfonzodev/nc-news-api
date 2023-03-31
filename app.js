@@ -1,5 +1,5 @@
-const endpoints = require("./endpoints.json");
 const {
+  getEndpoints,
   getTopics,
   getArticleById,
   getArticles,
@@ -21,9 +21,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/api", (req, res) => {
-  res.status(200).send(endpoints);
-});
+app.get("/api", getEndpoints);
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/users", getUsers);
