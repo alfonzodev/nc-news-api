@@ -1,4 +1,5 @@
 const {
+  getEndpoints,
   getTopics,
   getArticleById,
   getArticles,
@@ -20,6 +21,7 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api", getEndpoints);
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/users", getUsers);

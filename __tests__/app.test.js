@@ -12,6 +12,22 @@ afterAll(() => {
   return db.end();
 });
 
+describe("/api", () => {
+  describe("GET", () => {
+    test("200: responds with JSON describing all the available endpoints on your API", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          for (endpoint in body) {
+            expect(body[endpoint]).toMatchObject({
+              description: expect.any(String),
+            });
+          }
+        });
+    });
+  });
+});
 describe("/api/topics", () => {
   describe("GET", () => {
     test("200: responds with an array of all topic objects", () => {

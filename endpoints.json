@@ -16,10 +16,112 @@
       "articles": [
         {
           "title": "Seafood substitutions are increasing",
+          "article_id": 1,
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "votes": 32,
+          "created_at": 1527695953341,
+          "comment_count": "12",
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an article by id",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "article_id": 1,
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "votes": 32,
+        "created_at": 1527695953341,
+        "comment_count": "12",
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "increments/decrements article votes by amount defined in passed object",
+    "exampleRequestBody": { "inc_votes": -10 },
+    "exampleResponse": {
+      "article": {
+        "title": "Seafood substitutions are increasing",
+        "article_id": 1,
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "votes": 22,
+        "created_at": 1527695953341,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array of comments for the specified article ordered by creation date",
+    "queries": [],
+    "exampleResponse": {
+      "comments": [
+        {
+          "body": "Very nice!",
+          "votes": 2,
+          "author": "butter_bridge",
+          "article_id": 1,
+          "created_at": 1586179020000
+        },
+        {
+          "body": "Best article I have read!",
+          "votes": 3,
+          "author": "solitary_reader",
+          "article_id": 1,
+          "created_at": 1586179045267
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "creates new comment",
+    "exampleRequestBody": {
+      "username": "king_of_comments",
+      "body": "This is a new comment!"
+    },
+    "exampleResponse": {
+      "comment": {
+        "body": "This is a new comment!",
+        "votes": 0,
+        "author": "king_of_comments",
+        "article_id": 1,
+        "created_at": 1586179023210
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes comment by id",
+    "exampleResponse": {}
+  },
+  "GET /api/users": {
+    "description": "serves an array of all usernames",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "weegembump",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "king_of_comments",
+          "name": "Anthony",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        },
+        {
+          "username": "solitary_reader",
+          "name": "Emma",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
         }
       ]
     }
