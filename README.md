@@ -4,7 +4,7 @@
 
 An Express api for an articles website developed with TDD.
 <br><br>
-**live version** - https://top-tier-articles.onrender.com
+**live version** - https://top-tier-articles.onrender.com/api
 
 ### Features
 
