@@ -70,15 +70,15 @@ const fetchArticles = (sort_by, order, topic) => {
   return db.query(queryStr, queryParams);
 };
 
-const updateArticleVoteCount = (article_id, incrementVote) => {
-  if (!incrementVote.hasOwnProperty("inc_votes")) {
+const updateArticleVotes = (article_id, incrementVotes) => {
+  if (!incrementVotes.hasOwnProperty("inc_votes")) {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
   }
 
   return db
     .query(
       "UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *",
-      [incrementVote.inc_votes, article_id]
+      [incrementVotes.inc_votes, article_id]
     )
     .then((data) => {
       if (data.rowCount === 0) {
@@ -92,4 +92,4 @@ const updateArticleVoteCount = (article_id, incrementVote) => {
     });
 };
 
-module.exports = { fetchArticlebyId, fetchArticles, updateArticleVoteCount };
+module.exports = { fetchArticlebyId, fetchArticles, updateArticleVotes };

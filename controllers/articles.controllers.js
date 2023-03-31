@@ -1,7 +1,7 @@
 const {
   fetchArticles,
   fetchArticlebyId,
-  updateArticleVoteCount,
+  updateArticleVotes,
 } = require("../models/articles.models.js");
 
 const { checkExists } = require("../models/utils.models.js");
@@ -32,10 +32,10 @@ const getArticles = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-const patchVoteCount = (req, res, next) => {
+const patchArticleVotes = (req, res, next) => {
   const { article_id } = req.params;
   const incrementVote = req.body;
-  updateArticleVoteCount(article_id, incrementVote)
+  updateArticleVotes(article_id, incrementVote)
     .then((data) => {
       const updatedArticle = data.rows[0];
       res.status(200).send({ updatedArticle });
@@ -45,4 +45,4 @@ const patchVoteCount = (req, res, next) => {
     });
 };
 
-module.exports = { getArticles, getArticleById, patchVoteCount };
+module.exports = { getArticles, getArticleById, patchArticleVotes };
