@@ -1,9 +1,5 @@
 const db = require("../db/connection.js");
 
-const fetchTopics = () => {
-  return db.query("SELECT * FROM topics");
-};
-
 const fetchArticlebyId = (article_id) => {
   return db
     .query(
@@ -74,25 +70,6 @@ const fetchArticles = (sort_by, order, topic) => {
   return db.query(queryStr, queryParams);
 };
 
-const fetchCommentsByArticle = (article_id) => {
-  return db.query(
-    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC",
-    [article_id]
-  );
-};
-
-const insertComment = (article_id, comment) => {
-  if (!comment.hasOwnProperty("username") || !comment.hasOwnProperty("body")) {
-    return Promise.reject({ status: 400, msg: "Error: missing information." });
-  } else if (comment.body === "") {
-    return Promise.reject({ status: 400, msg: "Error: empty comment." });
-  }
-  return db.query(
-    "INSERT INTO comments(body, article_id, author) VALUES ($1, $2, $3) RETURNING *",
-    [comment.body, article_id, comment.username]
-  );
-};
-
 const updateArticleVoteCount = (article_id, incrementVote) => {
   if (!incrementVote.hasOwnProperty("inc_votes")) {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
@@ -115,26 +92,4 @@ const updateArticleVoteCount = (article_id, incrementVote) => {
     });
 };
 
-const deleteCommentById = (comment_id) => {
-  return db
-    .query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
-    .then((data) => {
-      if (data.rowCount === 0) {
-        return Promise.reject({
-          status: 404,
-          msg: "Not Found: comment_id does not exist.",
-        });
-      }
-      return data;
-    });
-};
-
-module.exports = {
-  fetchTopics,
-  fetchArticlebyId,
-  fetchArticles,
-  fetchCommentsByArticle,
-  insertComment,
-  updateArticleVoteCount,
-  deleteCommentById,
-};
+module.exports = { fetchArticlebyId, fetchArticles, updateArticleVoteCount };
