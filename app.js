@@ -1,3 +1,4 @@
+const endpoints = require("./endpoints.json");
 const {
   getTopics,
   getArticleById,
@@ -20,6 +21,9 @@ const app = express();
 
 app.use(express.json());
 
+app.get("/api", (req, res) => {
+  res.status(200).send(endpoints);
+});
 app.get("/api/topics", getTopics);
 app.get("/api/articles", getArticles);
 app.get("/api/users", getUsers);
