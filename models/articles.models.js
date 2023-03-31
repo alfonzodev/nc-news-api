@@ -13,7 +13,7 @@ const fetchArticlebyId = (article_id) => {
       if (data.rowCount === 0) {
         return Promise.reject({
           status: 404,
-          msg: "Not found: article_id does not exist!",
+          msg: "Not Found: article_id does not exist.",
         });
       } else {
         return data;
@@ -84,7 +84,7 @@ const updateArticleVoteCount = (article_id, incrementVote) => {
       if (data.rowCount === 0) {
         return Promise.reject({
           status: 404,
-          msg: "Not found: article_id does not exist!",
+          msg: "Not Found: article_id does not exist.",
         });
       } else {
         return data;

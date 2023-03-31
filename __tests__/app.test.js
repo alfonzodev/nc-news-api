@@ -50,7 +50,7 @@ describe("/api/topics", () => {
 
 describe("/api/users", () => {
   describe("GET", () => {
-    test("200: responds with an array of user objects with 'username', 'name' and 'avatar_url' properties", () => {
+    test("200: responds with an array of user objects", () => {
       return request(app)
         .get("/api/users")
         .expect(200)
@@ -64,6 +64,33 @@ describe("/api/users", () => {
               avatar_url: expect.any(String),
             });
           });
+        });
+    });
+  });
+});
+
+describe("/api/users/:username", () => {
+  describe("GET", () => {
+    test("200: responds with a user object of provided username", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: 'butter_bridge',
+            name: 'jonny',
+            avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+          });
+        });
+    });
+    test("404: responds with Not Found if username does not exist", () => {
+      return request(app)
+        .get("/api/users/fake_username")
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Not Found: username does not exist.')
         });
     });
   });
@@ -277,7 +304,7 @@ describe("/api/articles/:article_id", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not found: article_id does not exist!");
+          expect(msg).toBe("Not Found: article_id does not exist.");
         });
     });
     test("400: responds with Bad Request when article id is not valid", () => {
@@ -352,7 +379,7 @@ describe("/api/articles/:article_id", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Not found: article_id does not exist!");
+          expect(msg).toBe("Not Found: article_id does not exist.");
         });
     });
     test("400: responds with Bad Request when req body does not contain inc_votes property", () => {
@@ -594,7 +621,7 @@ describe("Handle invalid endpoints", () => {
       .expect(404)
       .then(({ body }) => {
         const { msg } = body;
-        expect(msg).toBe("Not found!");
+        expect(msg).toBe("Not Found.");
       });
   });
 });
