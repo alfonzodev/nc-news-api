@@ -78,9 +78,10 @@ describe("/api/users/:username", () => {
         .then(({ body }) => {
           const { user } = body;
           expect(user).toMatchObject({
-            username: 'butter_bridge',
-            name: 'jonny',
-            avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
@@ -90,7 +91,7 @@ describe("/api/users/:username", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe('Not Found: username does not exist.')
+          expect(msg).toBe("Not Found: username does not exist.");
         });
     });
   });
@@ -261,6 +262,204 @@ describe("/api/articles", () => {
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Error: Invalid query - random.");
+        });
+    });
+  });
+  describe("POST", () => {
+    test("201: responds with the newly added article plus a comment count property", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: "butter_bridge",
+            title: "Cats are cute",
+            body: "Cats are extremely cute.",
+            topic: "cats",
+            article_img_url:
+              "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0,
+          });
+        });
+    });
+    test("201: responds with the newly added article and default article_image_url when none provided", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(201)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            author: "butter_bridge",
+            title: "Cats are cute",
+            body: "Cats are extremely cute.",
+            topic: "cats",
+            article_img_url:
+              "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+            votes: 0,
+            created_at: expect.any(String),
+            comment_count: 0,
+          });
+        });
+    });
+    test("404: responds with Not Found when author in new article does not exist ", () => {
+      const newArticle = {
+        author: "fake_author",
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: author does not exist.");
+        });
+    });
+    test("404: responds with Not Found when topic in new article does not exist ", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        topic: "fake-topic",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: topic does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when new article title is empty", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when new article body is empty", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        body: "",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when new article has no title property", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when new article has no body property", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when new article has no topic property", () => {
+      const newArticle = {
+        author: "butter_bridge",
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when new article has no author property", () => {
+      const newArticle = {
+        title: "Cats are cute",
+        body: "Cats are extremely cute.",
+        topic: "cats",
+        article_img_url:
+          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+      };
+      return request(app)
+        .post("/api/articles")
+        .send(newArticle)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
         });
     });
   });

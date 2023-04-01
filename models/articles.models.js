@@ -92,4 +92,25 @@ const updateArticleVotes = (article_id, incrementVotes) => {
     });
 };
 
-module.exports = { fetchArticlebyId, fetchArticles, updateArticleVotes };
+const createArticle = (newArticle) => {
+  if(newArticle.title === "" || newArticle.body === ""){
+    return Promise.reject({status: 400, msg: "Error: missing information."})
+  } 
+
+  let queryStr = 'INSERT INTO articles';
+  let queryParams = [newArticle.author, newArticle.title, newArticle.body, newArticle.topic];
+
+  if(newArticle.hasOwnProperty('article_img_url')) {
+    queryStr += '(author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    queryParams.push(newArticle.article_img_url);
+  }else{
+    queryStr += '(author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *';
+  } 
+  return db.query(queryStr, queryParams).then((data) => {
+    // Adding comment_count property to response object
+    data.rows[0].comment_count = 0;
+    return data;
+  });
+};
+
+module.exports = { fetchArticlebyId, fetchArticles, updateArticleVotes, createArticle };
