@@ -28,6 +28,31 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "creates a new article",
+    "exampleRequestBody": {
+      "author": "butter_bridge",
+      "title": "Cats are cute",
+      "body": "Cats are extremely cute.",
+      "topic": "cats",
+      "article_img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80"
+    },
+    "exampleResponse": {
+      "article": [
+        {
+          "article_id": 2,
+          "author": "butter_bridge",
+          "title": "Cats are cute",
+          "body": "Cats are extremely cute.",
+          "topic": "cats",
+          "article_img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+          "votes": 0,
+          "created_at": 1527695974432,
+          "comment_count": 0
+        }
+      ]
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an article by id",
     "queries": [],
