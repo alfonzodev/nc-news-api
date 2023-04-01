@@ -2,6 +2,7 @@ const {
   fetchArticles,
   fetchArticlebyId,
   updateArticleVotes,
+  createArticle,
 } = require("../models/articles.models.js");
 
 const { checkExists } = require("../models/utils.models.js");
@@ -45,4 +46,12 @@ const patchArticleVotes = (req, res, next) => {
     });
 };
 
-module.exports = { getArticles, getArticleById, patchArticleVotes };
+const postArticle = (req, res, next) => {
+  const newArticle = req.body;
+  createArticle(newArticle).then((data) => {
+    const article = data.rows[0];
+    res.status(201).send({article});
+  }).catch((err) => next(err))
+}
+
+module.exports = { getArticles, getArticleById, patchArticleVotes, postArticle };
