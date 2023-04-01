@@ -9,10 +9,12 @@ An Express api for an articles website developed with TDD.
 ### Features
 
 - View articles and comments
+- Create new articles
 - Comment on articles
 - Delete comments
-- Upvote/Downvote articles and comments
-- Create new articles (to be implemented)
+- Upvote/Downvote articles
+- Upvote/Downvote comments
+
 
 ### Technologies Used
 
