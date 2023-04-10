@@ -146,26 +146,40 @@
     "exampleResponse": {}
   },
   "GET /api/users": {
-    "description": "serves an array of all usernames",
+    "description": "serves an array of all users",
     "queries": [],
     "exampleResponse": {
       "users": [
         {
           "username": "weegembump",
           "name": "jonny",
+          "email": "jonny@email.com",
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         },
         {
           "username": "king_of_comments",
           "name": "Anthony",
+          "email": "anthony@email.com",
           "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
         },
         {
           "username": "solitary_reader",
           "name": "Emma",
+          "email": "emma@email.com",
           "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
         }
       ]
+    }
+  },
+  "POST /api/users": {
+    "description": "registers a new user",
+    "exampleResponse": {
+      "user": {
+          "username": "weegembump",
+          "name": "jonny",
+          "email": "jonny@email.com",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
     }
   },
   "GET /api/users/:username": {
@@ -176,6 +190,7 @@
         {
           "username": "weegembump",
           "name": "jonny",
+          "email": "jonny@email.com",
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
       ]

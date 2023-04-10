@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../app.js");
 const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
+const bcrypt = require("bcrypt");
 const seed = require("../db/seeds/seed");
 
 beforeEach(() => {
@@ -61,9 +62,157 @@ describe("/api/users", () => {
             expect(user).toMatchObject({
               username: expect.any(String),
               name: expect.any(String),
+              email: expect.any(String),
               avatar_url: expect.any(String),
             });
           });
+        });
+    });
+  });
+  describe("POST", () => {
+    test("201: responds with an object of the newly created user", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+        avatar_url:
+          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: "test_username",
+            name: "Test User",
+            email: "test@email.com",
+            avatar_url:
+          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+          });
+        });
+    });
+    test("201: accepts user object with no avatar_url", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: "test_username",
+            name: "Test User",
+            email: "test@email.com",
+            avatar_url: null
+          });
+        });
+    });
+    test("409: responds with Conflict when username already exists", () => {
+      const newUser = {
+        username: "butter_bridge",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(409)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Key (username)=(butter_bridge) already exists.")
+        });
+    });
+    test("409: responds with Conflict when email already exists", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(409)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Key (email)=(jonny@email.com) already exists.")
+        });
+    });
+    test("400: responds with Bad Request when username not provided", () => {
+      const newUser = {
+        name: "Test User",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.")
+        });
+    });
+    test("400: responds with Bad Request when name not provided", () => {
+      const newUser = {
+        username: "test_username",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.")
+        });
+    });
+    test("400: responds with Bad Request when email not provided", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.")
+        });
+    });
+    test("400: responds with Bad Request when password not provided", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "jonny@email.com",
+      };
+
+      return request(app)
+        .post("/api/users")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.")
         });
     });
   });
@@ -80,6 +229,7 @@ describe("/api/users/:username", () => {
           expect(user).toMatchObject({
             username: "butter_bridge",
             name: "jonny",
+            email: "jonny@email.com",
             avatar_url:
               "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });

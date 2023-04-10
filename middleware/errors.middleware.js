@@ -18,6 +18,9 @@ const psqlErrorHandler = (err, req, res, next) => {
   if(err.code === "23502"){
     res.status(400).send({msg: "Error: missing information."})
   }
+  if(err.code === "23505"){
+    res.status(409).send({msg: `Error: ${err.detail}`})
+  }
   next(err);
 };
 
