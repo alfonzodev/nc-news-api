@@ -8,6 +8,7 @@ An Express api for an articles website developed with TDD.
 
 ### Features
 
+- Register users
 - View articles and comments
 - Create new articles
 - Comment on articles
