@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../app.js");
 const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
-const bcrypt = require("bcrypt");
 const seed = require("../db/seeds/seed");
 
 beforeEach(() => {
@@ -221,6 +220,84 @@ describe("/api/users/register", () => {
       });
     });
   })
+})
+
+describe("/api/users/login", () => {
+  describe("POST", () => {
+    test("200: responds with login successful message", () => {
+      const userCredentials = {
+        email: "jonny@email.com",
+        password: "jonny123#",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(200)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Success: Login successful!');
+        });
+    });
+    test("400: responds with Bad Request if user does not provide email", () => {
+      const userCredentials = {
+        password: "jonny123#",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Error: please provide email and password.');
+        });
+    });
+    test("400: responds with Bad Request if user does not provide password", () => {
+      const userCredentials = {
+        email: "fake@email.com",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Error: please provide email and password.');
+        });
+    });
+    test("404: responds with Not Found if email does not exist", () => {
+      const userCredentials = {
+        email: "fake@email.com",
+        password: "jonny123#",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Not Found: email does not exist.');
+        });
+    });
+    test("401: responds with unauthorized if password does not match", () => {
+      const userCredentials = {
+        email: "jonny@email.com",
+        password: "fakepassword",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(401)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Error: password does not match.');
+        });
+    });
+  });
 })
 
 describe("/api/users/:username", () => {
