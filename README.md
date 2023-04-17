@@ -47,6 +47,9 @@ An Express api for an articles website developed with TDD.
 - Run **npm start** to start the application.
 - Connect to the API using your preferred API Client on port 9090 (Don't have an API client? Check [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/download)).
 
+**Note:** 
+If you want to test the login functionality with the existing dummy users data, the unhashed passwords are in the format 'NameSurname123#' (e.g., name: 'Tom Tickle', password: 'TomTickle123#').
+
 ### API Endpoints
 
 | HTTP Methods | Endpoints | Action                            |
