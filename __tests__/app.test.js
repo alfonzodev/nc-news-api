@@ -3,6 +3,7 @@ const app = require("../app.js");
 const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed");
+const jwt = require('jsonwebtoken');
 
 beforeEach(() => {
   return seed(data);
@@ -72,159 +73,161 @@ describe("/api/users", () => {
 
 describe("/api/users/register", () => {
   describe("POST", () => {
-    describe("POST", () => {
-      test("201: responds with an object of the newly created user", () => {
-        const newUser = {
-          username: "test_username",
-          name: "Test User",
-          email: "test@email.com",
-          password: "test123#",
-          avatar_url:
-            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(201)
-          .then(({ body }) => {
-            const { user } = body;
-            expect(user).toMatchObject({
-              username: "test_username",
-              name: "Test User",
-              email: "test@email.com",
-              avatar_url:
-            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
-            });
+    test("201: responds with an object of the newly created user", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+        avatar_url:
+          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: "test_username",
+            name: "Test User",
+            email: "test@email.com",
+            avatar_url:
+              "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
           });
-      });
-      test("201: accepts user object with no avatar_url", () => {
-        const newUser = {
-          username: "test_username",
-          name: "Test User",
-          email: "test@email.com",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(201)
-          .then(({ body }) => {
-            const { user } = body;
-            expect(user).toMatchObject({
-              username: "test_username",
-              name: "Test User",
-              email: "test@email.com",
-              avatar_url: null
-            });
-          });
-      });
-      test("409: responds with Conflict when username already exists", () => {
-        const newUser = {
-          username: "butter_bridge",
-          name: "Test User",
-          email: "test@email.com",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(409)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: Key (username)=(butter_bridge) already exists.")
-          });
-      });
-      test("409: responds with Conflict when email already exists", () => {
-        const newUser = {
-          username: "test_username",
-          name: "Test User",
-          email: "jonny@email.com",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(409)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: Key (email)=(jonny@email.com) already exists.")
-          });
-      });
-      test("400: responds with Bad Request when username not provided", () => {
-        const newUser = {
-          name: "Test User",
-          email: "jonny@email.com",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: missing information.")
-          });
-      });
-      test("400: responds with Bad Request when name not provided", () => {
-        const newUser = {
-          username: "test_username",
-          email: "jonny@email.com",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: missing information.")
-          });
-      });
-      test("400: responds with Bad Request when email not provided", () => {
-        const newUser = {
-          username: "test_username",
-          name: "Test User",
-          password: "test123#",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: missing information.")
-          });
-      });
-      test("400: responds with Bad Request when password not provided", () => {
-        const newUser = {
-          username: "test_username",
-          name: "Test User",
-          email: "jonny@email.com",
-        };
-  
-        return request(app)
-          .post("/api/users/register")
-          .send(newUser)
-          .expect(400)
-          .then(({ body }) => {
-            const { msg } = body;
-            expect(msg).toBe("Error: missing information.")
-          });
-      });
+        });
     });
-  })
-})
+    test("201: accepts user object with no avatar_url", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          const { user } = body;
+          expect(user).toMatchObject({
+            username: "test_username",
+            name: "Test User",
+            email: "test@email.com",
+            avatar_url: null,
+          });
+        });
+    });
+    test("409: responds with Conflict when username already exists", () => {
+      const newUser = {
+        username: "butter_bridge",
+        name: "Test User",
+        email: "test@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(409)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe(
+            "Error: Key (username)=(butter_bridge) already exists."
+          );
+        });
+    });
+    test("409: responds with Conflict when email already exists", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(409)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe(
+            "Error: Key (email)=(jonny@email.com) already exists."
+          );
+        });
+    });
+    test("400: responds with Bad Request when username not provided", () => {
+      const newUser = {
+        name: "Test User",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when name not provided", () => {
+      const newUser = {
+        username: "test_username",
+        email: "jonny@email.com",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when email not provided", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        password: "test123#",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+    test("400: responds with Bad Request when password not provided", () => {
+      const newUser = {
+        username: "test_username",
+        name: "Test User",
+        email: "jonny@email.com",
+      };
+
+      return request(app)
+        .post("/api/users/register")
+        .send(newUser)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: missing information.");
+        });
+    });
+  });
+});
 
 describe("/api/users/login", () => {
   describe("POST", () => {
-    test("200: responds with login successful message", () => {
+    test("200: responds with access Json Web Token", () => {
       const userCredentials = {
         email: "jonny@email.com",
         password: "jonny123#",
@@ -235,8 +238,11 @@ describe("/api/users/login", () => {
         .send(userCredentials)
         .expect(200)
         .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe('Success: Login successful!');
+          const { accessToken } = body;
+          expect(typeof accessToken).toBe('string');
+          const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+          expect(decoded.username).toBe('butter_bridge');
+
         });
     });
     test("400: responds with Bad Request if user does not provide email", () => {
@@ -250,7 +256,7 @@ describe("/api/users/login", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe('Error: please provide email and password.');
+          expect(msg).toBe("Error: please provide email and password.");
         });
     });
     test("400: responds with Bad Request if user does not provide password", () => {
@@ -264,7 +270,7 @@ describe("/api/users/login", () => {
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe('Error: please provide email and password.');
+          expect(msg).toBe("Error: please provide email and password.");
         });
     });
     test("404: responds with Not Found if email does not exist", () => {
@@ -279,7 +285,7 @@ describe("/api/users/login", () => {
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe('Not Found: email does not exist.');
+          expect(msg).toBe("Not Found: email does not exist.");
         });
     });
     test("401: responds with unauthorized if password does not match", () => {
@@ -294,11 +300,11 @@ describe("/api/users/login", () => {
         .expect(401)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe('Error: password does not match.');
+          expect(msg).toBe("Error: password does not match.");
         });
     });
   });
-})
+});
 
 describe("/api/users/:username", () => {
   describe("GET", () => {
@@ -331,7 +337,6 @@ describe("/api/users/:username", () => {
 
 describe("/api/articles", () => {
   describe("GET", () => {
-
     test("200: responds with an array of 10 articles by default ordered by date descending", () => {
       return request(app)
         .get("/api/articles")
@@ -362,10 +367,10 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
 
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('12');
+          expect(total_count).toBe("12");
         });
     });
     test("200: responds with an array of articles ordered by date in ascending order", () => {
@@ -374,9 +379,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('12');
+          expect(total_count).toBe("12");
           // Checking order by date
           expect(articles).toBeSortedBy("created_at", { ascending: true });
         });
@@ -387,10 +392,10 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('11');
-          expect()
+          expect(total_count).toBe("11");
+          expect();
           // Checking object properties
           articles.forEach((article) => {
             expect(article).toMatchObject({
@@ -412,9 +417,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('12');
+          expect(total_count).toBe("12");
           // Checking order by date
           expect(articles).toBeSortedBy("author", { descending: true });
           // Checking object properties
@@ -438,9 +443,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('12');
+          expect(total_count).toBe("12");
           // Checking order by date
           expect(articles).toBeSortedBy("author", { ascending: true });
           // Checking object properties
@@ -464,9 +469,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          const {total_count} = body;
+          const { total_count } = body;
           expect(articles.length).toBe(10);
-          expect(total_count).toBe('11');
+          expect(total_count).toBe("11");
           // Checking order by date
           expect(articles).toBeSortedBy("author", { ascending: true });
           // Checking object properties
@@ -524,138 +529,138 @@ describe("/api/articles", () => {
     describe("Pagination Queries", () => {
       test("200: responds with an array of 10 articles when 'p' query is set to 1 and 'limit' query is not set", () => {
         return request(app)
-        .get("/api/articles?p=1")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(10);
-          const {total_count} = body;
-          expect(total_count).toBe('12');
-          // Checking order by date
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-          // Checking object properties
-          articles.forEach((article) => {
-            expect(article).toMatchObject({
-              author: expect.any(String),
-              title: expect.any(String),
-              article_id: expect.any(Number),
-              topic: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+          .get("/api/articles?p=1")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(10);
+            const { total_count } = body;
+            expect(total_count).toBe("12");
+            // Checking order by date
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+            // Checking object properties
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
             });
           });
-        });
       });
       test("200: responds with an array of 2 articles when 'p' query is set to 2 and 'limit' query is not set", () => {
         return request(app)
-        .get("/api/articles?p=2")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(2);
-          const {total_count} = body;
-          expect(total_count).toBe('12');
-          // Checking order by date
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-          // Checking object properties
-          articles.forEach((article) => {
-            expect(article).toMatchObject({
-              author: expect.any(String),
-              title: expect.any(String),
-              article_id: expect.any(Number),
-              topic: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+          .get("/api/articles?p=2")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(2);
+            const { total_count } = body;
+            expect(total_count).toBe("12");
+            // Checking order by date
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+            // Checking object properties
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
             });
           });
-        });
       });
       test("200: responds with an array of 5 articles when 'p' query is set to 1 and 'limit' query is set to 5", () => {
         return request(app)
-        .get("/api/articles?p=1&limit=5")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(5);
-          const {total_count} = body;
-          expect(total_count).toBe('12');
-          // Checking order by date
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-          // Checking object properties
-          articles.forEach((article) => {
-            expect(article).toMatchObject({
-              author: expect.any(String),
-              title: expect.any(String),
-              article_id: expect.any(Number),
-              topic: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+          .get("/api/articles?p=1&limit=5")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(5);
+            const { total_count } = body;
+            expect(total_count).toBe("12");
+            // Checking order by date
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+            // Checking object properties
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
             });
           });
-        });
       });
       test("200: responds with an array of 2 articles when 'p' query is set to 3 and 'limit' query is set to 5", () => {
         return request(app)
-        .get("/api/articles?p=3&limit=5")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(2);
-          const {total_count} = body;
-          expect(total_count).toBe('12');
-          // Checking order by date
-          expect(articles).toBeSortedBy("created_at", { descending: true });
-          // Checking object properties
-          articles.forEach((article) => {
-            expect(article).toMatchObject({
-              author: expect.any(String),
-              title: expect.any(String),
-              article_id: expect.any(Number),
-              topic: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              article_img_url: expect.any(String),
-              comment_count: expect.any(String),
+          .get("/api/articles?p=3&limit=5")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(2);
+            const { total_count } = body;
+            expect(total_count).toBe("12");
+            // Checking order by date
+            expect(articles).toBeSortedBy("created_at", { descending: true });
+            // Checking object properties
+            articles.forEach((article) => {
+              expect(article).toMatchObject({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+                comment_count: expect.any(String),
+              });
             });
           });
-        });
       });
       test("200: responds with an empty array if 'p' query is set higher than the amount of pages able to be filled by the amount of articles", () => {
         return request(app)
-        .get("/api/articles?p=99")
-        .expect(200)
-        .then(({ body }) => {
-          const { articles } = body;
-          expect(articles.length).toBe(0);
-          const {total_count} = body;
-          expect(total_count).toBe('12');
-        });
+          .get("/api/articles?p=99")
+          .expect(200)
+          .then(({ body }) => {
+            const { articles } = body;
+            expect(articles.length).toBe(0);
+            const { total_count } = body;
+            expect(total_count).toBe("12");
+          });
       });
       test("400: responds with Bad Request when limit is not a number", () => {
         return request(app)
-        .get("/api/articles?p=not_a_num")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Error: Invalid query - not_a_num.");
-        });
+          .get("/api/articles?p=not_a_num")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Invalid query - not_a_num.");
+          });
       });
       test("400: responds with Bad Request when p is not a number", () => {
         return request(app)
-        .get("/api/articles?p=not_a_num")
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Error: Invalid query - not_a_num.");
-        });
+          .get("/api/articles?p=not_a_num")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Invalid query - not_a_num.");
+          });
       });
-    })
+    });
   });
   describe("POST", () => {
     test("201: responds with the newly added article plus a comment count property", () => {
