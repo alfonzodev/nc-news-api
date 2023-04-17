@@ -1,9 +1,25 @@
 const db = require("../db/connection.js");
 
-const fetchCommentsByArticle = (article_id) => {
+const fetchCommentsByArticle = (article_id, limit, p) => {
+  
+  // validating and including pagination
+  if (isNaN(p)) {
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${p}.`,
+    });
+  } else if (isNaN(limit)) {
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${limit}.`,
+    });
+  }
+
+  const offset = limit * (p - 1);
+
   return db.query(
-    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC",
-    [article_id]
+    "SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3",
+    [article_id, limit, offset]
   );
 };
 
