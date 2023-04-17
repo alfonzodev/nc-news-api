@@ -249,13 +249,14 @@ describe("/api/users/:username", () => {
 
 describe("/api/articles", () => {
   describe("GET", () => {
-    test("200: responds with an array of articles containing all rows plus the comment_count ordered by date in descending order when no queries are provided", () => {
+
+    test("200: responds with an array of 10 articles by default ordered by date descending", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(12);
+          expect(articles.length).toBe(10);
           // Checking order by date
           expect(articles).toBeSortedBy("created_at", { descending: true });
           // Checking object properties
@@ -273,13 +274,27 @@ describe("/api/articles", () => {
           });
         });
     });
+    test("200: response body contains total_count of articles", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          const {total_count} = body;
+
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('12');
+        });
+    });
     test("200: responds with an array of articles ordered by date in ascending order", () => {
       return request(app)
         .get("/api/articles?order=asc")
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(12);
+          const {total_count} = body;
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('12');
           // Checking order by date
           expect(articles).toBeSortedBy("created_at", { ascending: true });
         });
@@ -290,7 +305,10 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(11);
+          const {total_count} = body;
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('11');
+          expect()
           // Checking object properties
           articles.forEach((article) => {
             expect(article).toMatchObject({
@@ -312,7 +330,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(12);
+          const {total_count} = body;
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('12');
           // Checking order by date
           expect(articles).toBeSortedBy("author", { descending: true });
           // Checking object properties
@@ -336,7 +356,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(12);
+          const {total_count} = body;
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('12');
           // Checking order by date
           expect(articles).toBeSortedBy("author", { ascending: true });
           // Checking object properties
@@ -360,7 +382,9 @@ describe("/api/articles", () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
-          expect(articles.length).toBe(11);
+          const {total_count} = body;
+          expect(articles.length).toBe(10);
+          expect(total_count).toBe('11');
           // Checking order by date
           expect(articles).toBeSortedBy("author", { ascending: true });
           // Checking object properties
@@ -414,6 +438,142 @@ describe("/api/articles", () => {
           expect(msg).toBe("Error: Invalid query - random.");
         });
     });
+
+    describe("Pagination Queries", () => {
+      test("200: responds with an array of 10 articles when 'p' query is set to 1 and 'limit' query is not set", () => {
+        return request(app)
+        .get("/api/articles?p=1")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(10);
+          const {total_count} = body;
+          expect(total_count).toBe('12');
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+      });
+      test("200: responds with an array of 2 articles when 'p' query is set to 2 and 'limit' query is not set", () => {
+        return request(app)
+        .get("/api/articles?p=2")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(2);
+          const {total_count} = body;
+          expect(total_count).toBe('12');
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+      });
+      test("200: responds with an array of 5 articles when 'p' query is set to 1 and 'limit' query is set to 5", () => {
+        return request(app)
+        .get("/api/articles?p=1&limit=5")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(5);
+          const {total_count} = body;
+          expect(total_count).toBe('12');
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+      });
+      test("200: responds with an array of 2 articles when 'p' query is set to 3 and 'limit' query is set to 5", () => {
+        return request(app)
+        .get("/api/articles?p=3&limit=5")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(2);
+          const {total_count} = body;
+          expect(total_count).toBe('12');
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: expect.any(String),
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(String),
+            });
+          });
+        });
+      });
+      test("200: responds with an empty array if 'p' query is set higher than the amount of pages able to be filled by the amount of articles", () => {
+        return request(app)
+        .get("/api/articles?p=99")
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(0);
+          const {total_count} = body;
+          expect(total_count).toBe('12');
+        });
+      });
+      test("400: responds with Bad Request when limit is not a number", () => {
+        return request(app)
+        .get("/api/articles?p=not_a_num")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Invalid query - not_a_num.");
+        });
+      });
+      test("400: responds with Bad Request when p is not a number", () => {
+        return request(app)
+        .get("/api/articles?p=not_a_num")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: Invalid query - not_a_num.");
+        });
+      });
+    })
   });
   describe("POST", () => {
     test("201: responds with the newly added article plus a comment count property", () => {

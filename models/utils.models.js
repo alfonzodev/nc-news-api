@@ -15,4 +15,5 @@ const checkExists = (table, col, value) => {
   });
 };
 
-module.exports = { checkExists };
+
+module.exports = { checkExists};

@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const format = require("pg-format");
 
 const fetchArticlebyId = (article_id) => {
   return db
@@ -21,7 +22,8 @@ const fetchArticlebyId = (article_id) => {
     });
 };
 
-const fetchArticles = (sort_by, order, topic) => {
+const fetchArticles = (sort_by, order, topic, limit, p) => {
+
   const validSortQueries = [
     "author",
     "title",
@@ -31,25 +33,29 @@ const fetchArticles = (sort_by, order, topic) => {
     "votes",
     "comment_count",
   ];
-  let queryStr = `
+  let selectQueryStr = `
     SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.comment_id) AS comment_count 
     FROM articles 
     LEFT JOIN comments ON articles.article_id = comments.article_id 
   `;
+  const selectQueryParams = [];
 
-  const queryParams = [];
+  let countQueryStr = `SELECT COUNT(*) FROM articles`
+  const countQueryParams = [];
 
   // Including topic in sql query
   if (topic) {
-    queryStr += ` WHERE topic = $1`;
-    queryParams.push(topic);
+    selectQueryStr += ` WHERE topic = $1`;
+    selectQueryParams.push(topic);
+    countQueryStr += ` WHERE topic = $1`;
+    countQueryParams.push(topic);
   }
 
-  queryStr += " GROUP BY articles.article_id";
+  selectQueryStr += ` GROUP BY articles.article_id`;
 
   // Validating and including sort_by
   if (validSortQueries.includes(sort_by)) {
-    queryStr += ` ORDER BY ${sort_by}`;
+    selectQueryStr += ` ORDER BY ${sort_by}`;
   } else {
     return Promise.reject({
       status: 400,
@@ -59,7 +65,7 @@ const fetchArticles = (sort_by, order, topic) => {
 
   // validating and including order
   if (order === "asc" || order === "desc") {
-    queryStr += ` ${order.toUpperCase()}`;
+    selectQueryStr += ` ${order.toUpperCase()}`;
   } else {
     return Promise.reject({
       status: 400,
@@ -67,7 +73,23 @@ const fetchArticles = (sort_by, order, topic) => {
     });
   }
 
-  return db.query(queryStr, queryParams);
+  // validating and including pagination
+  if(isNaN(p)){
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${p}.`,
+    });
+  }else if(isNaN(limit)){
+    return Promise.reject({
+      status: 400,
+      msg: `Error: Invalid query - ${limit}.`,
+    });
+  }
+    selectQueryStr += topic ? ` LIMIT $2 OFFSET $3` : ` LIMIT $1 OFFSET $2`
+    const offset = limit * (p - 1);
+    selectQueryParams.push(limit, offset)
+
+  return Promise.all([db.query(selectQueryStr, selectQueryParams), db.query(countQueryStr, countQueryParams)]);
 };
 
 const updateArticleVotes = (article_id, incrementVotes) => {
