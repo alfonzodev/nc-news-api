@@ -19,16 +19,17 @@ const getArticleById = (req, res, next) => {
 };
 
 const getArticles = (req, res, next) => {
-  const { sort_by = "created_at", order = "desc", topic } = req.query;
+  const { sort_by = "created_at", order = "desc", topic, limit = 10, p = 1 } = req.query;
 
-  const articlesPromises = [fetchArticles(sort_by, order, topic)];
+  const articlesPromises = [fetchArticles(sort_by, order, topic, limit, p)] ;
 
   if (topic) articlesPromises.push(checkExists("topics", "slug", topic));
 
   Promise.all(articlesPromises)
-    .then((promisesResult) => {
-      const articles = promisesResult[0].rows;
-      res.status(200).send({ articles });
+    .then(([fetchArticlesResult]) => {
+      const articles = fetchArticlesResult[0].rows;
+      const articlesCount = fetchArticlesResult[1].rows[0].count;
+      res.status(200).send({ articles, total_count: articlesCount});
     })
     .catch((err) => next(err));
 };
