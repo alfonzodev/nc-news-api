@@ -23,7 +23,6 @@ const fetchArticlebyId = (article_id) => {
 };
 
 const fetchArticles = (sort_by, order, topic, limit, p) => {
-
   const validSortQueries = [
     "author",
     "title",
@@ -40,7 +39,7 @@ const fetchArticles = (sort_by, order, topic, limit, p) => {
   `;
   const selectQueryParams = [];
 
-  let countQueryStr = `SELECT COUNT(*) FROM articles`
+  let countQueryStr = `SELECT COUNT(*) FROM articles`;
   const countQueryParams = [];
 
   // Including topic in sql query
@@ -74,22 +73,25 @@ const fetchArticles = (sort_by, order, topic, limit, p) => {
   }
 
   // validating and including pagination
-  if(isNaN(p)){
+  if (isNaN(p)) {
     return Promise.reject({
       status: 400,
       msg: `Error: Invalid query - ${p}.`,
     });
-  }else if(isNaN(limit)){
+  } else if (isNaN(limit)) {
     return Promise.reject({
       status: 400,
       msg: `Error: Invalid query - ${limit}.`,
     });
   }
-    selectQueryStr += topic ? ` LIMIT $2 OFFSET $3` : ` LIMIT $1 OFFSET $2`
-    const offset = limit * (p - 1);
-    selectQueryParams.push(limit, offset)
+  selectQueryStr += topic ? ` LIMIT $2 OFFSET $3` : ` LIMIT $1 OFFSET $2`;
+  const offset = limit * (p - 1);
+  selectQueryParams.push(limit, offset);
 
-  return Promise.all([db.query(selectQueryStr, selectQueryParams), db.query(countQueryStr, countQueryParams)]);
+  return Promise.all([
+    db.query(selectQueryStr, selectQueryParams),
+    db.query(countQueryStr, countQueryParams),
+  ]);
 };
 
 const updateArticleVotes = (article_id, incrementVotes) => {
@@ -115,19 +117,26 @@ const updateArticleVotes = (article_id, incrementVotes) => {
 };
 
 const createArticle = (newArticle) => {
-  if(newArticle.title === "" || newArticle.body === ""){
-    return Promise.reject({status: 400, msg: "Error: missing information."})
-  } 
+  if (newArticle.title === "" || newArticle.body === "") {
+    return Promise.reject({ status: 400, msg: "Error: missing information." });
+  }
 
-  let queryStr = 'INSERT INTO articles';
-  let queryParams = [newArticle.author, newArticle.title, newArticle.body, newArticle.topic];
+  let queryStr = "INSERT INTO articles";
+  let queryParams = [
+    newArticle.author,
+    newArticle.title,
+    newArticle.body,
+    newArticle.topic,
+  ];
 
-  if(newArticle.hasOwnProperty('article_img_url')) {
-    queryStr += '(author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+  if (newArticle.hasOwnProperty("article_img_url")) {
+    queryStr +=
+      "(author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *";
     queryParams.push(newArticle.article_img_url);
-  }else{
-    queryStr += '(author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *';
-  } 
+  } else {
+    queryStr +=
+      "(author, title, body, topic) VALUES ($1, $2, $3, $4) RETURNING *";
+  }
   return db.query(queryStr, queryParams).then((data) => {
     // Adding comment_count property to response object
     data.rows[0].comment_count = 0;
@@ -135,4 +144,9 @@ const createArticle = (newArticle) => {
   });
 };
 
-module.exports = { fetchArticlebyId, fetchArticles, updateArticleVotes, createArticle };
+module.exports = {
+  fetchArticlebyId,
+  fetchArticles,
+  updateArticleVotes,
+  createArticle,
+};

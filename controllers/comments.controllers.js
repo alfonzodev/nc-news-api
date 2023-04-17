@@ -9,9 +9,10 @@ const { checkExists } = require("../models/utils.models.js");
 
 const getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
+  const {limit = 10, p = 1} = req.query;
   Promise.all([
     checkExists("articles", "article_id", article_id),
-    fetchCommentsByArticle(article_id),
+    fetchCommentsByArticle(article_id, limit, p),
   ])
     .then((promisesResult) => {
       const comments = promisesResult[1].rows;

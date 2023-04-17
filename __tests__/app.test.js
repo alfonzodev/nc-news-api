@@ -1026,13 +1026,13 @@ describe("/api/comments/:comment_id", () => {
 
 describe("/api/articles/:article_id/comments", () => {
   describe("GET", () => {
-    test("200: responds with an array of comments for the given article_id ordered by creation date in descending order", () => {
+    test("200: responds with an array of 10 comments by default, ordered by creation date in descending order", () => {
       return request(app)
         .get("/api/articles/1/comments")
         .expect(200)
         .then(({ body }) => {
           const { comments } = body;
-          expect(comments.length).toBe(11);
+          expect(comments.length).toBe(10);
           // Checking order
           expect(comments).toBeSortedBy("created_at", { descending: true });
           // Checking object properties
@@ -1074,6 +1074,122 @@ describe("/api/articles/:article_id/comments", () => {
           const { msg } = body;
           expect(msg).toBe("Error: invalid data format.");
         });
+    });
+    describe("Pagination Queries", () => {
+      test("200: responds with an array of 10 comments when 'p' query is set to 1 and 'limit' query is not set", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=1")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(10);
+
+            // Checking order by date
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+            // Checking object properties
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: 1,
+              });
+            });
+          });
+      });
+      test("200: responds with an array of 1 comment when 'p' query is set to 2 and 'limit' query is not set", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=2")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(1);
+            // Checking object properties
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: 1,
+              });
+            });
+          });
+      });
+      test("200: responds with an array of 5 comments when 'p' query is set to 1 and 'limit' query is set to 5", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=1&limit=5")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(5);
+
+            // Checking order by date
+            expect(comments).toBeSortedBy("created_at", { descending: true });
+
+            // Checking object properties
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: 1,
+              });
+            });
+          });
+      });
+      test("200: responds with an array of 1 comment when 'p' query is set to 3 and 'limit' query is set to 5", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=3&limit=5")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(1);
+            // Checking object properties
+            comments.forEach((comment) => {
+              expect(comment).toMatchObject({
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
+                article_id: 1,
+              });
+            });
+          });
+      });
+      test("200: responds with an empty array if 'p' query is set higher than the amount of pages able to be filled by the amount of comments", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=99")
+          .expect(200)
+          .then(({ body }) => {
+            const { comments } = body;
+            expect(comments.length).toBe(0);
+          });
+      });
+      test("400: responds with Bad Request when limit is not a number", () => {
+        return request(app)
+          .get("/api/articles/1/comments?limit=not_a_num")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Invalid query - not_a_num.");
+          });
+      });
+      test("400: responds with Bad Request when p is not a number", () => {
+        return request(app)
+          .get("/api/articles/1/comments?p=not_a_num")
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Invalid query - not_a_num.");
+          });
+      });
     });
   });
   describe("POST", () => {
