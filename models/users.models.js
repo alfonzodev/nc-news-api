@@ -20,7 +20,7 @@ const fetchUserByUsername = (username) => {
     });
 };
 
-const registerUser = async ({username, name, email, password, avatar_url }) => {
+const createUser = async ({username, name, email, password, avatar_url }) => {
   const queryParams = [username, name, email, avatar_url];
   let queryStr = 'INSERT INTO users(username, name, email, avatar_url, password) VALUES($1, $2, $3, $4, $5) RETURNING username, name, email, avatar_url';
   if(password){
@@ -33,4 +33,4 @@ const registerUser = async ({username, name, email, password, avatar_url }) => {
   return db.query(queryStr, queryParams);
 }
 
-module.exports = { fetchUsers, fetchUserByUsername, registerUser };
+module.exports = { fetchUsers, fetchUserByUsername, createUser };
