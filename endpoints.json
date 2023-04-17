@@ -171,8 +171,15 @@
       ]
     }
   },
-  "POST /api/users": {
+  "POST /api/users/register": {
     "description": "registers a new user",
+    "exampleRequestBody": {
+      "name": "jonny",
+      "username": "wegembump",
+      "email": "jonny@email.com",
+      "password": "jonny123#",
+      "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+    },
     "exampleResponse": {
       "user": {
           "username": "weegembump",
@@ -180,6 +187,16 @@
           "email": "jonny@email.com",
           "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
+    }
+  },
+  "POST /api/users/login": {
+    "description": "logins user",
+    "exampleRequestBody": {
+      "email": "jonny@email.com",
+      "password": "jonny123#"
+    },
+    "exampleResponse": {
+      "msg": "Success: Login successful!"
     }
   },
   "GET /api/users/:username": {
