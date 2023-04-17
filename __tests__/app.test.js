@@ -2,7 +2,6 @@ const request = require("supertest");
 const app = require("../app.js");
 const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
-const bcrypt = require("bcrypt");
 const seed = require("../db/seeds/seed");
 
 beforeEach(() => {
@@ -69,154 +68,237 @@ describe("/api/users", () => {
         });
     });
   });
+});
+
+describe("/api/users/register", () => {
   describe("POST", () => {
-    test("201: responds with an object of the newly created user", () => {
-      const newUser = {
-        username: "test_username",
-        name: "Test User",
-        email: "test@email.com",
-        password: "test123#",
-        avatar_url:
-          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
-      };
-
-      return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(201)
-        .then(({ body }) => {
-          const { user } = body;
-          expect(user).toMatchObject({
-            username: "test_username",
-            name: "Test User",
-            email: "test@email.com",
-            avatar_url:
-          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+    describe("POST", () => {
+      test("201: responds with an object of the newly created user", () => {
+        const newUser = {
+          username: "test_username",
+          name: "Test User",
+          email: "test@email.com",
+          password: "test123#",
+          avatar_url:
+            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(201)
+          .then(({ body }) => {
+            const { user } = body;
+            expect(user).toMatchObject({
+              username: "test_username",
+              name: "Test User",
+              email: "test@email.com",
+              avatar_url:
+            "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+            });
           });
-        });
-    });
-    test("201: accepts user object with no avatar_url", () => {
-      const newUser = {
-        username: "test_username",
-        name: "Test User",
-        email: "test@email.com",
-        password: "test123#",
-      };
-
-      return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(201)
-        .then(({ body }) => {
-          const { user } = body;
-          expect(user).toMatchObject({
-            username: "test_username",
-            name: "Test User",
-            email: "test@email.com",
-            avatar_url: null
+      });
+      test("201: accepts user object with no avatar_url", () => {
+        const newUser = {
+          username: "test_username",
+          name: "Test User",
+          email: "test@email.com",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(201)
+          .then(({ body }) => {
+            const { user } = body;
+            expect(user).toMatchObject({
+              username: "test_username",
+              name: "Test User",
+              email: "test@email.com",
+              avatar_url: null
+            });
           });
-        });
+      });
+      test("409: responds with Conflict when username already exists", () => {
+        const newUser = {
+          username: "butter_bridge",
+          name: "Test User",
+          email: "test@email.com",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(409)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Key (username)=(butter_bridge) already exists.")
+          });
+      });
+      test("409: responds with Conflict when email already exists", () => {
+        const newUser = {
+          username: "test_username",
+          name: "Test User",
+          email: "jonny@email.com",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(409)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: Key (email)=(jonny@email.com) already exists.")
+          });
+      });
+      test("400: responds with Bad Request when username not provided", () => {
+        const newUser = {
+          name: "Test User",
+          email: "jonny@email.com",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: missing information.")
+          });
+      });
+      test("400: responds with Bad Request when name not provided", () => {
+        const newUser = {
+          username: "test_username",
+          email: "jonny@email.com",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: missing information.")
+          });
+      });
+      test("400: responds with Bad Request when email not provided", () => {
+        const newUser = {
+          username: "test_username",
+          name: "Test User",
+          password: "test123#",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: missing information.")
+          });
+      });
+      test("400: responds with Bad Request when password not provided", () => {
+        const newUser = {
+          username: "test_username",
+          name: "Test User",
+          email: "jonny@email.com",
+        };
+  
+        return request(app)
+          .post("/api/users/register")
+          .send(newUser)
+          .expect(400)
+          .then(({ body }) => {
+            const { msg } = body;
+            expect(msg).toBe("Error: missing information.")
+          });
+      });
     });
-    test("409: responds with Conflict when username already exists", () => {
-      const newUser = {
-        username: "butter_bridge",
-        name: "Test User",
-        email: "test@email.com",
-        password: "test123#",
+  })
+})
+
+describe("/api/users/login", () => {
+  describe("POST", () => {
+    test("200: responds with login successful message", () => {
+      const userCredentials = {
+        email: "jonny@email.com",
+        password: "jonny123#",
       };
 
       return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(409)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(200)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Error: Key (username)=(butter_bridge) already exists.")
+          expect(msg).toBe('Success: Login successful!');
         });
     });
-    test("409: responds with Conflict when email already exists", () => {
-      const newUser = {
-        username: "test_username",
-        name: "Test User",
-        email: "jonny@email.com",
-        password: "test123#",
+    test("400: responds with Bad Request if user does not provide email", () => {
+      const userCredentials = {
+        password: "jonny123#",
       };
 
       return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(409)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Error: Key (email)=(jonny@email.com) already exists.")
-        });
-    });
-    test("400: responds with Bad Request when username not provided", () => {
-      const newUser = {
-        name: "Test User",
-        email: "jonny@email.com",
-        password: "test123#",
-      };
-
-      return request(app)
-        .post("/api/users")
-        .send(newUser)
+        .post("/api/users/login")
+        .send(userCredentials)
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Error: missing information.")
+          expect(msg).toBe('Error: please provide email and password.');
         });
     });
-    test("400: responds with Bad Request when name not provided", () => {
-      const newUser = {
-        username: "test_username",
+    test("400: responds with Bad Request if user does not provide password", () => {
+      const userCredentials = {
+        email: "fake@email.com",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Error: please provide email and password.');
+        });
+    });
+    test("404: responds with Not Found if email does not exist", () => {
+      const userCredentials = {
+        email: "fake@email.com",
+        password: "jonny123#",
+      };
+
+      return request(app)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe('Not Found: email does not exist.');
+        });
+    });
+    test("401: responds with unauthorized if password does not match", () => {
+      const userCredentials = {
         email: "jonny@email.com",
-        password: "test123#",
+        password: "fakepassword",
       };
 
       return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(400)
+        .post("/api/users/login")
+        .send(userCredentials)
+        .expect(401)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe("Error: missing information.")
-        });
-    });
-    test("400: responds with Bad Request when email not provided", () => {
-      const newUser = {
-        username: "test_username",
-        name: "Test User",
-        password: "test123#",
-      };
-
-      return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Error: missing information.")
-        });
-    });
-    test("400: responds with Bad Request when password not provided", () => {
-      const newUser = {
-        username: "test_username",
-        name: "Test User",
-        email: "jonny@email.com",
-      };
-
-      return request(app)
-        .post("/api/users")
-        .send(newUser)
-        .expect(400)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe("Error: missing information.")
+          expect(msg).toBe('Error: password does not match.');
         });
     });
   });
-});
+})
 
 describe("/api/users/:username", () => {
   describe("GET", () => {

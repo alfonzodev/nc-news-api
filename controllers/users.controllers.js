@@ -1,7 +1,8 @@
 const {
   fetchUsers,
   fetchUserByUsername,
-  registerUser
+  createUser,
+  authenticateUser
 } = require("../models/users.models.js");
 
 const getUsers = (req, res, next) => {
@@ -23,9 +24,9 @@ const getUserByUsername = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-const postUser = (req, res, next) => {
+const registerUser = (req, res, next) => {
   const newUser = req.body;
-  registerUser(newUser)
+  createUser(newUser)
     .then((data) => {
       const user = data.rows[0];
       res.status(201).send({ user });
@@ -33,4 +34,12 @@ const postUser = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-module.exports = { getUsers, getUserByUsername, postUser };
+const loginUser = (req, res, next) => {
+  const userCredentials = req.body;
+  authenticateUser(userCredentials).then(() => {
+    res.status(200).send({msg: "Success: Login successful!"});
+  }).catch((err) => next(err));
+}
+
+
+module.exports = { getUsers, getUserByUsername, registerUser, loginUser };
