@@ -37,12 +37,12 @@ const registerUser = (req, res, next) => {
 const loginUser = (req, res, next) => {
   const userCredentials = req.body;
   authenticateUser(userCredentials)
-    .then(({ accessToken, refreshToken }) => {
+    .then((accessToken) => {
       res
-        .cookie("refresh_token", refreshToken, {
+        .cookie("access_token", accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV !== "development",
-          maxAge: 5 * 24 * 60 * 60 * 1000,
+          maxAge: 24 * 60 * 60 * 1000,
         })
         .status(200)
         .send({ accessToken });
