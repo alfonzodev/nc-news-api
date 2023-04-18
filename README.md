@@ -1,14 +1,13 @@
 # Northcoders News API
 
-### Intro
-
-An Express api for an articles website developed with TDD.
+An Express api for an articles website developed with Test Driven Development. 
 <br><br>
 **live version** - https://top-tier-articles.onrender.com/api
 
-### Features
+## Features
 
 - Register users
+- Login users
 - View articles and comments
 - Create new articles
 - Comment on articles
@@ -17,38 +16,41 @@ An Express api for an articles website developed with TDD.
 - Upvote/Downvote comments
 
 
-### Technologies Used
+## Technologies Used
 
 - NodeJS
 - ExpressJS
 - PostgreSQL
 
-### Required Programs
+## Required Programs
 
 - [NodeJS 18.15.0 LTS +](https://nodejs.org/en)<br>
 - [PostgreSQL 15+](https://www.postgresql.org/download/)
 
-### Installation Guide
+## Installation Guide
 
 - Clone this repository.
 - Run **npm install** to install all dependencies;
 - Create the .env files in your project root folder (see .env-example for reference):
-  - **_.env.development_** - to contain variable with dev database name
-  - **_.env.test_** - to contain variable with test database name
-- Run **npm setup-dbs** to create the databases
-- Run **npm seed** to seed the dev database
+  - **_.env.development_** - to contain a variable with dev database name and a variable with jwt token secret
+  - **_.env.test_** - to contain a variable with test database name and a variable with jwt token secret
+- Run **npm run setup-dbs** to create the databases
+- Run **npm run seed** to seed the dev database
 
-### Testing
+## Testing
 
 - Run **npm test** (the seeding of the test database is done automatically when testing)
 
-### Usage
+## Usage
 
 - Run **npm start** to start the application.
 - Connect to the API using your preferred API Client on port 9090 (Don't have an API client? Check [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/download)).
 
-**Note:** 
-If you want to test the login functionality with the existing dummy users data, the unhashed passwords are in the format 'NameSurname123#' (e.g., name: 'Tom Tickle', password: 'TomTickle123#').
+### Authentication
+
+This api supports email and password authentication with JWT's.
+
+**Note:** If you want to test the login functionality with the existing dummy users data, the unhashed passwords are in the format 'NameSurname123#' (e.g., name: 'Tom Tickle', password: 'TomTickle123#').
 
 ### API Endpoints
 
