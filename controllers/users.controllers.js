@@ -2,7 +2,7 @@ const {
   fetchUsers,
   fetchUserByUsername,
   createUser,
-  authenticateUser
+  authenticateUser,
 } = require("../models/users.models.js");
 
 const getUsers = (req, res, next) => {
@@ -36,10 +36,18 @@ const registerUser = (req, res, next) => {
 
 const loginUser = (req, res, next) => {
   const userCredentials = req.body;
-  authenticateUser(userCredentials).then(() => {
-    res.status(200).send({msg: "Success: Login successful!"});
-  }).catch((err) => next(err));
-}
-
+  authenticateUser(userCredentials)
+    .then((accessToken) => {
+      res
+        .cookie("access_token", accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV !== "development",
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .status(200)
+        .send({ accessToken });
+    })
+    .catch((err) => next(err));
+};
 
 module.exports = { getUsers, getUserByUsername, registerUser, loginUser };
