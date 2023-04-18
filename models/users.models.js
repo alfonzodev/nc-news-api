@@ -61,24 +61,14 @@ const authenticateUser = async ({ email, password }) => {
   if (match) {
     const username = user.username;
 
-    // Generate an access token with 15min of expiration
+    // Generate an access token with 1d of expiration
     const accessToken = jwt.sign(
       { username },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: 15 * 60 }
+      process.env.JWT_TOKEN_SECRET,
+      { expiresIn: '1d' }
     );
 
-    // Generate a refresh token with 5d of expiration
-    const refreshToken = jwt.sign(
-      { username },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "5d" }
-    );
-
-    // Add refreshToken to jwt table(non-existing yet) in corresponding username row
-    // this will allow for logout functionality in the future
-
-    return {accessToken, refreshToken};
+    return accessToken;
   } else {
     return Promise.reject({
       status: 401,
