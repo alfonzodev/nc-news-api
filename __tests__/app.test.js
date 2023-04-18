@@ -936,6 +936,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/1")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -957,6 +958,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: -10 };
       return request(app)
         .patch("/api/articles/1")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -978,6 +980,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/not-a-num")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -989,6 +992,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/9999")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(404)
         .then(({ body }) => {
@@ -1000,6 +1004,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = {};
       return request(app)
         .patch("/api/articles/1")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1011,6 +1016,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: "wrong-data-format" };
       return request(app)
         .patch("/api/articles/1")
+        .set("Authorization", `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1316,6 +1322,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(201)
         .then(({ body }) => {
@@ -1338,6 +1345,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(201)
         .then(({ body }) => {
@@ -1359,6 +1367,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/9999/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(404)
         .then(({ body }) => {
@@ -1373,6 +1382,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/not-a-number/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1387,6 +1397,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(404)
         .then(({ body }) => {
@@ -1400,6 +1411,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1414,6 +1426,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1427,6 +1440,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
+        .set("Authorization", `Bearer ${token}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
