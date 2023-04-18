@@ -3,9 +3,18 @@ const app = require("../app.js");
 const data = require("../db/data/test-data/index.js");
 const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+
+const testAccessToken = jwt.sign(
+  { username: "test_username" },
+  process.env.JWT_TOKEN_SECRET,
+  { expiresIn: 60 }
+);
+
+let token = "";
 
 beforeEach(() => {
+  token = testAccessToken;
   return seed(data);
 });
 
@@ -239,10 +248,9 @@ describe("/api/users/login", () => {
         .expect(200)
         .then(({ body }) => {
           const { accessToken } = body;
-          expect(typeof accessToken).toBe('string');
-          const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-          expect(decoded.username).toBe('butter_bridge');
-
+          expect(typeof accessToken).toBe("string");
+          const decoded = jwt.verify(accessToken, process.env.JWT_TOKEN_SECRET);
+          expect(decoded.username).toBe("butter_bridge");
         });
     });
     test("400: responds with Bad Request if user does not provide email", () => {
@@ -674,6 +682,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(201)
         .then(({ body }) => {
@@ -701,6 +710,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(201)
         .then(({ body }) => {
@@ -730,6 +740,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(404)
         .then(({ body }) => {
@@ -748,6 +759,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(404)
         .then(({ body }) => {
@@ -766,6 +778,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -784,6 +797,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -801,6 +815,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -818,6 +833,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -835,6 +851,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -852,6 +869,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
+        .set("Authorization", `Bearer ${token}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -1006,11 +1024,15 @@ describe("/api/articles/:article_id", () => {
 describe("/api/comments/:comment_id", () => {
   describe("DELETE", () => {
     test("204: responds with no content when successfully deleted comment by id", () => {
-      return request(app).delete("/api/comments/1").expect(204);
+      return request(app)
+        .delete("/api/comments/1")
+        .set("Authorization", `Bearer ${token}`)
+        .expect(204);
     });
     test("404: responds with Not Found when comment_id does not exist", () => {
       return request(app)
         .delete("/api/comments/9999")
+        .set('Authorization', `Bearer ${token}`)
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
@@ -1020,6 +1042,7 @@ describe("/api/comments/:comment_id", () => {
     test("400: responds with Bad Request when comment_id is invalid", () => {
       return request(app)
         .delete("/api/comments/not-a-num")
+        .set('Authorization', `Bearer ${token}`)
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
@@ -1032,6 +1055,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/1")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -1050,6 +1074,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: -20 };
       return request(app)
         .patch("/api/comments/1")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -1068,6 +1093,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/not-a-num")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1079,6 +1105,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/9999")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(404)
         .then(({ body }) => {
@@ -1090,6 +1117,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = {};
       return request(app)
         .patch("/api/comments/1")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1101,6 +1129,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: "wrong-data-format" };
       return request(app)
         .patch("/api/comments/1")
+        .set('Authorization', `Bearer ${token}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
