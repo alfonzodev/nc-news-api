@@ -42,6 +42,7 @@ const loginUser = (req, res, next) => {
         .cookie("access_token", accessToken, {
           httpOnly: true,
           maxAge: 24 * 60 * 60 * 1000,
+          sameSite: "none",
         })
         .status(200)
         .send({ accessToken });
