@@ -41,7 +41,6 @@ const loginUser = (req, res, next) => {
       res
         .cookie("access_token", accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV !== "development",
           maxAge: 24 * 60 * 60 * 1000,
         })
         .status(200)

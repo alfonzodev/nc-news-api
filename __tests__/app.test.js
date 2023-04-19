@@ -5,16 +5,26 @@ const db = require("../db/connection.js");
 const seed = require("../db/seeds/seed");
 const jwt = require("jsonwebtoken");
 
-const testAccessToken = jwt.sign(
-  { username: "test_username" },
+// Sing token with existing username
+const validUsernameToken = jwt.sign(
+  { username: "butter_bridge" },
   process.env.JWT_TOKEN_SECRET,
   { expiresIn: 60 }
 );
 
-let token = "";
+// Sign token with fake username
+const invalidUsernameToken = jwt.sign(
+  { username: "fake_user" },
+  process.env.JWT_TOKEN_SECRET,
+  { expiresIn: 60 }
+);
+
+let validToken = "";
+let invalidToken = "";
 
 beforeEach(() => {
-  token = testAccessToken;
+  validToken = validUsernameToken;
+  invalidToken = invalidUsernameToken;
   return seed(data);
 });
 
@@ -319,6 +329,7 @@ describe("/api/users/:username", () => {
     test("200: responds with a user object of provided username", () => {
       return request(app)
         .get("/api/users/butter_bridge")
+        .set("cookie", `access_token=${validToken}`)
         .expect(200)
         .then(({ body }) => {
           const { user } = body;
@@ -334,6 +345,7 @@ describe("/api/users/:username", () => {
     test("404: responds with Not Found if username does not exist", () => {
       return request(app)
         .get("/api/users/fake_username")
+        .set("cookie", `access_token=${validToken}`)
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
@@ -682,7 +694,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(201)
         .then(({ body }) => {
@@ -710,7 +722,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(201)
         .then(({ body }) => {
@@ -740,7 +752,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(404)
         .then(({ body }) => {
@@ -759,7 +771,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(404)
         .then(({ body }) => {
@@ -778,7 +790,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -797,7 +809,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -815,7 +827,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -833,7 +845,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -851,7 +863,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -869,7 +881,7 @@ describe("/api/articles", () => {
       };
       return request(app)
         .post("/api/articles")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(newArticle)
         .expect(400)
         .then(({ body }) => {
@@ -936,7 +948,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -958,7 +970,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: -10 };
       return request(app)
         .patch("/api/articles/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -980,7 +992,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/not-a-num")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -992,7 +1004,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/articles/9999")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(404)
         .then(({ body }) => {
@@ -1004,7 +1016,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = {};
       return request(app)
         .patch("/api/articles/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1016,7 +1028,7 @@ describe("/api/articles/:article_id", () => {
       const testIncVotes = { inc_votes: "wrong-data-format" };
       return request(app)
         .patch("/api/articles/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1032,13 +1044,13 @@ describe("/api/comments/:comment_id", () => {
     test("204: responds with no content when successfully deleted comment by id", () => {
       return request(app)
         .delete("/api/comments/1")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .expect(204);
     });
     test("404: responds with Not Found when comment_id does not exist", () => {
       return request(app)
         .delete("/api/comments/9999")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .expect(404)
         .then(({ body }) => {
           const { msg } = body;
@@ -1048,11 +1060,23 @@ describe("/api/comments/:comment_id", () => {
     test("400: responds with Bad Request when comment_id is invalid", () => {
       return request(app)
         .delete("/api/comments/not-a-num")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("401: responds with Unauthorized when logged in user is not author of comment", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .set("cookie", `access_token=${invalidToken}`)
+        .expect(401)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe(
+            "Error: Unauthorized - user is not author of comment."
+          );
         });
     });
   });
@@ -1061,7 +1085,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/1")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -1080,7 +1104,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: -20 };
       return request(app)
         .patch("/api/comments/1")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(200)
         .then(({ body }) => {
@@ -1099,7 +1123,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/not-a-num")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1111,7 +1135,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: 10 };
       return request(app)
         .patch("/api/comments/9999")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(404)
         .then(({ body }) => {
@@ -1123,7 +1147,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = {};
       return request(app)
         .patch("/api/comments/1")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1135,7 +1159,7 @@ describe("/api/comments/:comment_id", () => {
       const testIncVotes = { inc_votes: "wrong-data-format" };
       return request(app)
         .patch("/api/comments/1")
-        .set('Authorization', `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testIncVotes)
         .expect(400)
         .then(({ body }) => {
@@ -1322,7 +1346,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(201)
         .then(({ body }) => {
@@ -1345,7 +1369,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(201)
         .then(({ body }) => {
@@ -1367,7 +1391,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/9999/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(404)
         .then(({ body }) => {
@@ -1382,7 +1406,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/not-a-number/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1397,7 +1421,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(404)
         .then(({ body }) => {
@@ -1411,7 +1435,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1426,7 +1450,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1440,7 +1464,7 @@ describe("/api/articles/:article_id/comments", () => {
       };
       return request(app)
         .post("/api/articles/8/comments")
-        .set("Authorization", `Bearer ${token}`)
+        .set("cookie", `access_token=${validToken}`)
         .send(testComment)
         .expect(400)
         .then(({ body }) => {
@@ -1459,6 +1483,28 @@ describe("Handle invalid endpoints", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Not Found.");
+      });
+  });
+});
+
+describe("Authentication Middleware (protected routes)", () => {
+  test("401: responds with Unauthorized when trying to access protected route without jwt", () => {
+    return request(app)
+      .delete("/api/comments/1")
+      .expect(401)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Error: Not authorized.");
+      });
+  });
+  test("403: responds with Forbidden when trying to access protected route with invalid jwt", () => {
+    return request(app)
+      .get("/api/users/rogersop")
+      .set("cookie", `access_token=invalid_token`)
+      .expect(403)
+      .then(({ body }) => {
+        const { msg } = body;
+        expect(msg).toBe("Error: invalid token.");
       });
   });
 });

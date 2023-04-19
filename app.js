@@ -9,8 +9,9 @@ const {
 } = require("./middleware/errors.middleware.js");
 
 const apiRouter = require("./routes/api-router.js");
+const corsOptions = require("./config/cors.options.js");
 
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(express.json());
 
 app.use("/api", apiRouter);

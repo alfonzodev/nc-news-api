@@ -2,21 +2,21 @@ const jwt = require("jsonwebtoken");
 
 const protect = async (req, res, next) => {
   if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
+    req.headers.cookie &&
+    req.headers.cookie.startsWith("access_token")
   ) {
     try {
       // Get JWT token from HTTP header
-      const token = req.headers.authorization.split(" ")[1];
+      const token = req.headers.cookie.split("=")[1];
       // Verify JWT token
       const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET);
-
-      // Get username from the token
+      
+      // Get username from the token payload
       req.username = decoded.username;
 
       next();
     } catch (error) {
-      next({ status: 403, msg: `${error.name}: ${error.message}` });
+      next({ status: 403, msg: `Error: invalid token.` });
     }
   } else {
     // No token
