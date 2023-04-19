@@ -16,7 +16,7 @@ const protect = async (req, res, next) => {
 
       next();
     } catch (error) {
-      next({ status: 403, msg: `${error.name}: ${error.message}` });
+      next({ status: 403, msg: `Error: invalid token.` });
     }
   } else {
     // No token

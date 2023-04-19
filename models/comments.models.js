@@ -1,7 +1,6 @@
 const db = require("../db/connection.js");
 
 const fetchCommentsByArticle = (article_id, limit, p) => {
-  
   // validating and including pagination
   if (isNaN(p)) {
     return Promise.reject({
@@ -35,9 +34,9 @@ const insertComment = (article_id, comment) => {
   );
 };
 
-const deleteCommentById = (comment_id) => {
+const deleteCommentById = (comment_id, username) => {
   return db
-    .query("DELETE FROM comments WHERE comment_id = $1", [comment_id])
+    .query("SELECT * FROM comments WHERE comment_id = $1", [comment_id])
     .then((data) => {
       if (data.rowCount === 0) {
         return Promise.reject({
@@ -45,8 +44,17 @@ const deleteCommentById = (comment_id) => {
           msg: "Not Found: comment_id does not exist.",
         });
       }
-      return data;
-    });
+      if (data.rows[0].author !== username) {
+        return Promise.reject({
+          status: 401,
+          msg: "Error: Unauthorized - user is not author of comment.",
+        });
+      }
+      return db.query(
+        "DELETE FROM comments WHERE comment_id = $1",
+        [comment_id]
+      );
+    })
 };
 
 const updateCommentVotes = (incrementVotes, comment_id) => {
