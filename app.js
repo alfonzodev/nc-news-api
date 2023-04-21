@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require('cors');
+const credentials = require('./middleware/credentials.middleware.js')
 
 const {
   errorHandlerCustom,
@@ -11,6 +12,7 @@ const {
 const apiRouter = require("./routes/api-router.js");
 const corsOptions = require("./config/cors.options.js");
 
+app.use(credentials);
 app.use(cors(corsOptions))
 app.use(express.json());
 
