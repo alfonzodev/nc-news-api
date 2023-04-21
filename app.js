@@ -12,8 +12,7 @@ const {
 const apiRouter = require("./routes/api-router.js");
 const corsOptions = require("./config/cors.options.js");
 
-app.use(credentials);
-app.use(cors(corsOptions))
+app.use(cors())
 app.use(express.json());
 
 app.use("/api", apiRouter);
