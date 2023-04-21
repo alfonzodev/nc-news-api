@@ -5,7 +5,7 @@ const {getUsers, registerUser, getUserByUsername, loginUser} = require('../contr
 const { protect } =  require("../middleware/auth.middleware.js");
 
 usersRouter.get("/", getUsers);
-usersRouter.get("/:username", protect, getUserByUsername);
+usersRouter.get("/:username", getUserByUsername);
 usersRouter.post("/register", registerUser);
 usersRouter.post("/login", loginUser);
 

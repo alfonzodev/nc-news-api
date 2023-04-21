@@ -6,8 +6,8 @@ const {getCommentsByArticleId, postComment} = require('../controllers/comments.c
 const {protect} = require('../middleware/auth.middleware.js');
 
 
-articlesRouter.route("/").get(getArticles).post(protect, postArticle);
-articlesRouter.route("/:article_id").get(getArticleById).patch(protect, patchArticleVotes);
-articlesRouter.route("/:article_id/comments").get(getCommentsByArticleId).post(protect, postComment);
+articlesRouter.route("/").get(getArticles).post( postArticle);
+articlesRouter.route("/:article_id").get(getArticleById).patch( patchArticleVotes);
+articlesRouter.route("/:article_id/comments").get(getCommentsByArticleId).post( postComment);
 
 module.exports = articlesRouter;

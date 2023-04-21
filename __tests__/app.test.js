@@ -1067,18 +1067,6 @@ describe("/api/comments/:comment_id", () => {
           expect(msg).toBe("Error: invalid data format.");
         });
     });
-    test("401: responds with Unauthorized when logged in user is not author of comment", () => {
-      return request(app)
-        .delete("/api/comments/1")
-        .set("cookie", `access_token=${invalidToken}`)
-        .expect(401)
-        .then(({ body }) => {
-          const { msg } = body;
-          expect(msg).toBe(
-            "Error: Unauthorized - user is not author of comment."
-          );
-        });
-    });
   });
   describe("PATCH", () => {
     test("200: responds with updated comment object with the votes incremented by the amount defined in inc_votes", () => {
@@ -1483,28 +1471,6 @@ describe("Handle invalid endpoints", () => {
       .then(({ body }) => {
         const { msg } = body;
         expect(msg).toBe("Not Found.");
-      });
-  });
-});
-
-describe("Authentication Middleware (protected routes)", () => {
-  test("401: responds with Unauthorized when trying to access protected route without jwt", () => {
-    return request(app)
-      .delete("/api/comments/1")
-      .expect(401)
-      .then(({ body }) => {
-        const { msg } = body;
-        expect(msg).toBe("Error: Not authorized.");
-      });
-  });
-  test("403: responds with Forbidden when trying to access protected route with invalid jwt", () => {
-    return request(app)
-      .get("/api/users/rogersop")
-      .set("cookie", `access_token=invalid_token`)
-      .expect(403)
-      .then(({ body }) => {
-        const { msg } = body;
-        expect(msg).toBe("Error: invalid token.");
       });
   });
 });
