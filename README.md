@@ -48,7 +48,7 @@ An Express api for an articles website developed with Test Driven Development.
 
 ### Authentication
 
-This api supports email and password authentication with JWT's.
+This api supports email and password authentication, and authorization with JWT's.
 
 **Note:** If you want to test the login functionality with the existing dummy users data, the unhashed passwords are 'test123#' (e.g., email: 'tomtickle@email.com', password: 'test123#').
 
