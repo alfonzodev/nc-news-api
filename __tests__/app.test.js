@@ -323,6 +323,15 @@ describe("/api/users/login", () => {
     });
   });
 });
+describe("/api/users/logout", () => {
+  describe("GET", () => {
+    test("204: No Content", () => {
+      return request(app)
+        .get("/api/users/logout")
+        .expect(204)
+    });
+  });
+});
 
 describe("/api/users/:username", () => {
   describe("GET", () => {
