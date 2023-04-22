@@ -36,10 +36,11 @@ const postComment = (req, res, next) => {
 };
 
 const deleteComment = (req, res, next) => {
+  const username = req.username;
   const { comment_id } = req.params;
-  deleteCommentById(comment_id)
+  deleteCommentById(comment_id, username)
     .then(() => {
-      res.status(204).send({});
+      res.status(204).send();
     })
     .catch((err) => {
       next(err);
