@@ -942,13 +942,22 @@ describe("/api/articles/:article_id", () => {
           expect(msg).toBe("Not Found: article_id does not exist.");
         });
     });
-    test("400: responds with Bad Request when article id is not valid", () => {
+    test("400: responds with Bad Request when article id is not a number", () => {
       return request(app)
         .get("/api/articles/not-a-num")
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("400: responds with Bad Request when article id is too large to be an integer", () => {
+      return request(app)
+        .get("/api/articles/2147483648")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: value out of bounds.");
         });
     });
   });
@@ -1221,13 +1230,22 @@ describe("/api/articles/:article_id/comments", () => {
           expect(msg).toBe("Not Found: article_id does not exist.");
         });
     });
-    test("400: responds with Bad Request if article id is invalid", () => {
+    test("400: responds with Bad Request if article id is not a number", () => {
       return request(app)
         .get("/api/articles/not-a-num/comments")
         .expect(400)
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("400: responds with Bad Request if article id num is too large to be an integer", () => {
+      return request(app)
+        .get("/api/articles/2147483648/comments")
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: value out of bounds.");
         });
     });
     describe("Pagination Queries", () => {
