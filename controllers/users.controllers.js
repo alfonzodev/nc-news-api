@@ -50,5 +50,8 @@ const loginUser = (req, res, next) => {
     })
     .catch((err) => next(err));
 };
+const logoutUser = (req, res, next) => {
+  res.status(204).clearCookie('access_token', { httpOnly: true, sameSite: 'None', secure: true }).send();
+}
 
-module.exports = { getUsers, getUserByUsername, registerUser, loginUser };
+module.exports = { getUsers, getUserByUsername, registerUser, loginUser, logoutUser };
