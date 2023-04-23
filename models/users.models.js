@@ -44,7 +44,16 @@ const createUser = async ({ username, name, email, password, avatar_url }) => {
   }
   queryStr += "RETURNING username, name, email, avatar_url";
 
-  return db.query(queryStr, queryParams);
+  const response =  await db.query(queryStr, queryParams);
+
+  const user = response.rows[0];
+
+  // Generate an access token with 1d of expiration
+  const accessToken = jwt.sign({ username }, process.env.JWT_TOKEN_SECRET, {
+    expiresIn: "1d",
+  });
+
+  return {user, accessToken};
 };
 
 const authenticateUser = async ({ email, password }) => {
@@ -75,7 +84,8 @@ const authenticateUser = async ({ email, password }) => {
       expiresIn: "1d",
     });
 
-    return accessToken;
+    delete user.password;
+    return {user, accessToken};
   } else {
     return Promise.reject({
       status: 401,

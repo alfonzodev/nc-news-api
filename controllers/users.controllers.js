@@ -27,9 +27,16 @@ const getUserByUsername = (req, res, next) => {
 const registerUser = (req, res, next) => {
   const newUser = req.body;
   createUser(newUser)
-    .then((data) => {
-      const user = data.rows[0];
-      res.status(201).send({ user });
+    .then(({ user, accessToken }) => {
+      res
+        .cookie("access_token", accessToken, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000,
+          secure: process.env.NODE_ENV !== "development",
+          sameSite: "none",
+        })
+        .status(201)
+        .send({ user });
     })
     .catch((err) => next(err));
 };
@@ -37,7 +44,7 @@ const registerUser = (req, res, next) => {
 const loginUser = (req, res, next) => {
   const userCredentials = req.body;
   authenticateUser(userCredentials)
-    .then((accessToken) => {
+    .then(({ user, accessToken }) => {
       res
         .cookie("access_token", accessToken, {
           httpOnly: true,
@@ -46,12 +53,25 @@ const loginUser = (req, res, next) => {
           sameSite: "none",
         })
         .status(200)
-        .send({ accessToken });
+        .send({ user });
     })
     .catch((err) => next(err));
 };
 const logoutUser = (req, res, next) => {
-  res.status(204).clearCookie('access_token', { httpOnly: true, sameSite: 'None', secure: true }).send();
-}
+  res
+    .status(204)
+    .clearCookie("access_token", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    })
+    .send();
+};
 
-module.exports = { getUsers, getUserByUsername, registerUser, loginUser, logoutUser };
+module.exports = {
+  getUsers,
+  getUserByUsername,
+  registerUser,
+  loginUser,
+  logoutUser,
+};
