@@ -12,7 +12,7 @@ const apiRouter = require("./routes/api-router.js");
 
 app.use(
   cors({
-    origin: "https://nc-top-news.netlify.app",
+    origin: ["https://nc-top-news.netlify.app", "http://localhost:3000"],
     credentials: true,
     optionsSuccessStatus: 200,
   })
