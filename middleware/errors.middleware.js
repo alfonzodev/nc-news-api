@@ -18,7 +18,10 @@ const psqlErrorHandler = (err, req, res, next) => {
 
   if(err.code === "22003") return res.status(400).send({msg: "Error: value out of bounds."})
 
-  if(err.code === "23505") return res.status(409).send({msg: `Error: ${err.detail}`})
+  if(err.code === "23505"){
+    const entry = err.detail.match(/\w+/g)[1];
+    return res.status(409).send({msg: `Error: ${entry} already exists.`})
+  } 
 
   next(err);
 };
