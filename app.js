@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const cors = require('cors');
+const cors = require("cors");
 
 const {
   errorHandlerCustom,
@@ -9,9 +9,14 @@ const {
 } = require("./middleware/errors.middleware.js");
 
 const apiRouter = require("./routes/api-router.js");
-const corsOptions = require("./config/cors.options.js");
 
-app.use(cors(corsOptions))
+app.use(
+  cors({
+    origin: "https://nc-top-news.netlify.app/",
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
 app.use(express.json());
 
 app.use("/api", apiRouter);
