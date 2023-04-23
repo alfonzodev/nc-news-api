@@ -243,7 +243,7 @@ describe("/api/users/register", () => {
 
 describe("/api/users/login", () => {
   describe("POST", () => {
-    test("200: responds with access Json Web Token", () => {
+    test("200: responds with user object", () => {
       const userCredentials = {
         email: "jonny@email.com",
         password: "jonny123#",
@@ -254,10 +254,14 @@ describe("/api/users/login", () => {
         .send(userCredentials)
         .expect(200)
         .then(({ body }) => {
-          const { accessToken } = body;
-          expect(typeof accessToken).toBe("string");
-          const decoded = jwt.verify(accessToken, process.env.JWT_TOKEN_SECRET);
-          expect(decoded.username).toBe("butter_bridge");
+          const { user } = body;
+          expect(user).toMatchObject( {
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            email: "jonny@email.com",
+          })
         });
     });
     test("400: responds with Bad Request if user does not provide email", () => {
