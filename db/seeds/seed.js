@@ -31,7 +31,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(75) NOT NULL,
         name VARCHAR NOT NULL,
-        avatar_url VARCHAR
+        avatar_url VARCHAR DEFAULT 'https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729'
       );`);
 
       return Promise.all([topicsTablePromise, usersTablePromise]);
