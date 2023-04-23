@@ -25,15 +25,24 @@ const fetchUserByUsername = (username) => {
 };
 
 const createUser = async ({ username, name, email, password, avatar_url }) => {
-  const queryParams = [username, name, email, avatar_url];
-  let queryStr =
-    "INSERT INTO users(username, name, email, avatar_url, password) VALUES($1, $2, $3, $4, $5) RETURNING username, name, email, avatar_url";
+  const queryParams = [username, name, email];
+  let queryStr = "INSERT INTO users";
+
   if (password) {
     const hashedPwd = await bcrypt.hash(password, 10);
     queryParams.push(hashedPwd);
   } else {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
   }
+
+  if (!avatar_url) {
+    queryStr += "(username, name, email, password) VALUES($1, $2, $3, $4)";
+  } else if (avatar_url) {
+    queryStr +=
+      "(username, name, email, password, avatar_url) VALUES($1, $2, $3, $4, $5)";
+    queryParams.push(avatar_url);
+  }
+  queryStr += "RETURNING username, name, email, avatar_url";
 
   return db.query(queryStr, queryParams);
 };
@@ -62,11 +71,9 @@ const authenticateUser = async ({ email, password }) => {
     const username = user.username;
 
     // Generate an access token with 1d of expiration
-    const accessToken = jwt.sign(
-      { username },
-      process.env.JWT_TOKEN_SECRET,
-      { expiresIn: '1d' }
-    );
+    const accessToken = jwt.sign({ username }, process.env.JWT_TOKEN_SECRET, {
+      expiresIn: "1d",
+    });
 
     return accessToken;
   } else {

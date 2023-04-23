@@ -117,7 +117,7 @@ describe("/api/users/register", () => {
           });
         });
     });
-    test("201: accepts user object with no avatar_url", () => {
+    test("201: accepts user object with no avatar_url and creates user with default avatar_url", () => {
       const newUser = {
         username: "test_username",
         name: "Test User",
@@ -135,7 +135,8 @@ describe("/api/users/register", () => {
             username: "test_username",
             name: "Test User",
             email: "test@email.com",
-            avatar_url: null,
+            avatar_url:
+              "https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729",
           });
         });
     });
@@ -153,9 +154,7 @@ describe("/api/users/register", () => {
         .expect(409)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe(
-            "Error: Key (username)=(butter_bridge) already exists."
-          );
+          expect(msg).toBe("Error: username already exists.");
         });
     });
     test("409: responds with Conflict when email already exists", () => {
@@ -172,9 +171,7 @@ describe("/api/users/register", () => {
         .expect(409)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe(
-            "Error: Key (email)=(jonny@email.com) already exists."
-          );
+          expect(msg).toBe("Error: email already exists.");
         });
     });
     test("400: responds with Bad Request when username not provided", () => {
@@ -326,9 +323,7 @@ describe("/api/users/login", () => {
 describe("/api/users/logout", () => {
   describe("GET", () => {
     test("204: No Content", () => {
-      return request(app)
-        .get("/api/users/logout")
-        .expect(204)
+      return request(app).get("/api/users/logout").expect(204);
     });
   });
 });
