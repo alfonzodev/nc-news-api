@@ -255,13 +255,13 @@ describe("/api/users/login", () => {
         .expect(200)
         .then(({ body }) => {
           const { user } = body;
-          expect(user).toMatchObject( {
+          expect(user).toMatchObject({
             username: "butter_bridge",
             name: "jonny",
             avatar_url:
               "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
             email: "jonny@email.com",
-          })
+          });
         });
     });
     test("400: responds with Bad Request if user does not provide email", () => {
@@ -1056,6 +1056,44 @@ describe("/api/articles/:article_id", () => {
         .then(({ body }) => {
           const { msg } = body;
           expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+  });
+  describe("DELETE", () => {
+    test("204: responds with no content when successfully deleted article by id", () => {
+      return request(app)
+        .delete("/api/articles/1")
+        .set("cookie", `access_token=${validToken}`)
+        .expect(204);
+    });
+    test("404: responds with Not Found when article id does not exist", () => {
+      return request(app)
+        .delete("/api/articles/9999")
+        .set("cookie", `access_token=${validToken}`)
+        .expect(404)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Not Found: article_id does not exist.");
+        });
+    });
+    test("400: responds with Bad Request when article id is not a number", () => {
+      return request(app)
+        .delete("/api/articles/not-a-num")
+        .set("cookie", `access_token=${validToken}`)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: invalid data format.");
+        });
+    });
+    test("400: responds with Bad Request when article id is too large to be an integer", () => {
+      return request(app)
+        .delete("/api/articles/2147483648")
+        .set("cookie", `access_token=${validToken}`)
+        .expect(400)
+        .then(({ body }) => {
+          const { msg } = body;
+          expect(msg).toBe("Error: value out of bounds.");
         });
     });
   });
