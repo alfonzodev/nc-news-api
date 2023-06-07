@@ -1,6 +1,7 @@
 const {
   fetchArticles,
-  fetchArticlebyId,
+  fetchArticlesByAuthor,
+  fetchArticleById,
   updateArticleVotes,
   createArticle,
   deleteArticle,
@@ -11,7 +12,7 @@ const { checkExists } = require("../models/utils.models.js");
 const getArticleById = (req, res, next) => {
   const { article_id } = req.params;
 
-  fetchArticlebyId(article_id)
+  fetchArticleById(article_id)
     .then((data) => {
       const article = data.rows[0];
       res.status(200).send({ article });
@@ -37,6 +38,15 @@ const getArticles = (req, res, next) => {
       const articles = fetchArticlesResult[0].rows;
       const articlesCount = fetchArticlesResult[1].rows[0].count;
       res.status(200).send({ articles, total_count: articlesCount });
+    })
+    .catch((err) => next(err));
+};
+
+const getArticlesByAuthor = (req, res, next) => {
+  const author = req.username;
+  fetchArticlesByAuthor(author)
+    .then((data) => {
+      res.status(200).send({ articles: data.rows });
     })
     .catch((err) => next(err));
 };
@@ -79,4 +89,5 @@ module.exports = {
   patchArticleVotes,
   postArticle,
   deleteArticleById,
+  getArticlesByAuthor,
 };
