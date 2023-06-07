@@ -905,6 +905,36 @@ describe("/api/articles", () => {
   });
 });
 
+describe("/api/my-articles", () => {
+  describe("GET", () => {
+    test("200: responds with an array of articles from specific author, ordered by date descending", () => {
+      return request(app)
+        .get("/api/my-articles")
+        .set("cookie", `access_token=${validToken}`)
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(3);
+          // Checking order by date
+          expect(articles).toBeSortedBy("created_at", { descending: true });
+          // Checking object properties
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              author: "butter_bridge",
+              title: expect.any(String),
+              article_id: expect.any(Number),
+              topic: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("/api/articles/:article_id", () => {
   describe("GET", () => {
     test("200: responds with an article object", () => {

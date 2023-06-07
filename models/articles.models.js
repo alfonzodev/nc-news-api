@@ -1,7 +1,7 @@
 const db = require("../db/connection.js");
 const format = require("pg-format");
 
-const fetchArticlebyId = (article_id) => {
+const fetchArticleById = (article_id) => {
   return db
     .query(
       `SELECT articles.author, articles.body, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.comment_id) AS comment_count 
@@ -94,6 +94,13 @@ const fetchArticles = (sort_by, order, topic, limit, p) => {
   ]);
 };
 
+const fetchArticlesByAuthor = (author) => {
+  return db.query(
+    "SELECT * FROM articles WHERE author = $1 ORDER BY created_at DESC",
+    [author]
+  );
+};
+
 const updateArticleVotes = (article_id, incrementVotes) => {
   if (!incrementVotes.hasOwnProperty("inc_votes")) {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
@@ -162,7 +169,8 @@ const deleteArticle = (articleId) => {
 };
 
 module.exports = {
-  fetchArticlebyId,
+  fetchArticleById,
+  fetchArticlesByAuthor,
   fetchArticles,
   updateArticleVotes,
   createArticle,
