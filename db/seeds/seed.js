@@ -1,12 +1,8 @@
 const format = require("pg-format");
 const db = require("../connection");
-const {
-  convertTimestampToDate,
-  createRef,
-  formatComments,
-} = require("./utils");
+const { convertTimestampToDate, createRef, formatComments } = require("./utils");
 
-const seed = ({ topicData, userData, articleData, commentData }) => {
+const seed = ({ galleryData, avatarsData, topicData, userData, articleData, commentData }) => {
   return db
     .query(`DROP TABLE IF EXISTS comments;`)
     .then(() => {
@@ -17,6 +13,23 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     })
     .then(() => {
       return db.query(`DROP TABLE IF EXISTS topics;`);
+    })
+    .then(() => {
+      return db.query(`DROP TABLE IF EXISTS gallery;`);
+    })
+    .then(() => {
+      return db.query(`DROP TABLE IF EXISTS avatars;`);
+    })
+    .then(() => {
+      const galleryTablePromise = db.query(`CREATE TABLE gallery(
+        img_id SERIAL PRIMARY KEY,
+        img_url VARCHAR
+        );`);
+      const avatarsTablePromise = db.query(`CREATE TABLE avatars(
+          avatar_id SERIAL PRIMARY KEY,
+          avatar_img_url VARCHAR
+          );`);
+      return Promise.all([galleryTablePromise, avatarsTablePromise]);
     })
     .then(() => {
       const topicsTablePromise = db.query(`
@@ -31,7 +44,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         email VARCHAR(255) UNIQUE NOT NULL,
         password VARCHAR(75) NOT NULL,
         name VARCHAR NOT NULL,
-        avatar_url VARCHAR DEFAULT 'https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729'
+        avatar_id INT REFERENCES avatars(avatar_id) DEFAULT 1 
       );`);
 
       return Promise.all([topicsTablePromise, usersTablePromise]);
@@ -46,7 +59,7 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         body VARCHAR NOT NULL,
         created_at TIMESTAMP DEFAULT NOW(),
         votes INT DEFAULT 0 NOT NULL,
-        article_img_url VARCHAR DEFAULT 'https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700'
+        img_id INT REFERENCES gallery(img_id) DEFAULT 1
       );`);
     })
     .then(() => {
@@ -61,6 +74,19 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       );`);
     })
     .then(() => {
+      const insertGalleryQueryStr = format(
+        "INSERT INTO gallery (img_url) VALUES %L;",
+        galleryData.map((url) => [url])
+      );
+      const galleryPromise = db.query(insertGalleryQueryStr);
+      const insertAvatarsQueryStr = format(
+        "INSERT INTO avatars (avatar_img_url) VALUES %L;",
+        avatarsData.map((url) => [url])
+      );
+      const avatarsPromise = db.query(insertAvatarsQueryStr);
+      return Promise.all([galleryPromise, avatarsPromise]);
+    })
+    .then(() => {
       const insertTopicsQueryStr = format(
         "INSERT INTO topics (slug, description) VALUES %L;",
         topicData.map(({ slug, description }) => [slug, description])
@@ -68,13 +94,13 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
       const topicsPromise = db.query(insertTopicsQueryStr);
 
       const insertUsersQueryStr = format(
-        "INSERT INTO users ( username, name, email, password, avatar_url) VALUES %L;",
-        userData.map(({ username, name, email, password, avatar_url }) => [
+        "INSERT INTO users ( username, name, email, password, avatar_id) VALUES %L;",
+        userData.map(({ username, name, email, password, avatar_id }) => [
           username,
           name,
           email,
           password,
-          avatar_url,
+          avatar_id,
         ])
       );
       const usersPromise = db.query(insertUsersQueryStr);
@@ -84,17 +110,17 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     .then(() => {
       const formattedArticleData = articleData.map(convertTimestampToDate);
       const insertArticlesQueryStr = format(
-        "INSERT INTO articles (title, topic, author, body, created_at, votes, article_img_url) VALUES %L RETURNING *;",
+        "INSERT INTO articles (title, topic, author, body, created_at, votes, img_id) VALUES %L RETURNING *;",
         formattedArticleData.map(
-          ({
+          ({ title, topic, author, body, created_at, votes = 0, img_id }) => [
             title,
             topic,
             author,
             body,
             created_at,
-            votes = 0,
-            article_img_url,
-          }) => [title, topic, author, body, created_at, votes, article_img_url]
+            votes,
+            img_id,
+          ]
         )
       );
 
@@ -106,15 +132,13 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
 
       const insertCommentsQueryStr = format(
         "INSERT INTO comments (body, author, article_id, votes, created_at) VALUES %L;",
-        formattedCommentData.map(
-          ({ body, author, article_id, votes = 0, created_at }) => [
-            body,
-            author,
-            article_id,
-            votes,
-            created_at,
-          ]
-        )
+        formattedCommentData.map(({ body, author, article_id, votes = 0, created_at }) => [
+          body,
+          author,
+          article_id,
+          votes,
+          created_at,
+        ])
       );
       return db.query(insertCommentsQueryStr);
     });
