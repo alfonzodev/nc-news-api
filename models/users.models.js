@@ -3,15 +3,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const fetchUsers = () => {
-  return db.query("SELECT username, name, email, avatar_url FROM users");
+  return db.query("SELECT username, name, email, avatar_id FROM users");
 };
 
 const fetchUserByUsername = (username) => {
   return db
-    .query(
-      "SELECT username, name, email, avatar_url FROM users WHERE username = $1",
-      [username]
-    )
+    .query("SELECT username, name, email, avatar_id FROM users WHERE username = $1", [username])
     .then((data) => {
       if (data.rowCount === 0) {
         return Promise.reject({
@@ -24,7 +21,7 @@ const fetchUserByUsername = (username) => {
     });
 };
 
-const createUser = async ({ username, name, email, password, avatar_url }) => {
+const createUser = async ({ username, name, email, password, avatar_id }) => {
   const queryParams = [username, name, email];
   let queryStr = "INSERT INTO users";
 
@@ -35,16 +32,15 @@ const createUser = async ({ username, name, email, password, avatar_url }) => {
     return Promise.reject({ status: 400, msg: "Error: missing information." });
   }
 
-  if (!avatar_url) {
+  if (!avatar_id) {
     queryStr += "(username, name, email, password) VALUES($1, $2, $3, $4)";
-  } else if (avatar_url) {
-    queryStr +=
-      "(username, name, email, password, avatar_url) VALUES($1, $2, $3, $4, $5)";
-    queryParams.push(avatar_url);
+  } else if (avatar_id) {
+    queryStr += "(username, name, email, password, avatar_id) VALUES($1, $2, $3, $4, $5)";
+    queryParams.push(avatar_id);
   }
-  queryStr += "RETURNING username, name, email, avatar_url";
+  queryStr += "RETURNING username, name, email, avatar_id";
 
-  const response =  await db.query(queryStr, queryParams);
+  const response = await db.query(queryStr, queryParams);
 
   const user = response.rows[0];
 
@@ -53,7 +49,7 @@ const createUser = async ({ username, name, email, password, avatar_url }) => {
     expiresIn: "1d",
   });
 
-  return {user, accessToken};
+  return { user, accessToken };
 };
 
 const authenticateUser = async ({ email, password }) => {
@@ -64,9 +60,7 @@ const authenticateUser = async ({ email, password }) => {
     });
   }
 
-  const findUser = await db.query("SELECT * FROM users WHERE email = $1", [
-    email,
-  ]);
+  const findUser = await db.query("SELECT * FROM users WHERE email = $1", [email]);
   if (findUser.rowCount === 0) {
     return Promise.reject({
       status: 404,
@@ -85,7 +79,7 @@ const authenticateUser = async ({ email, password }) => {
     });
 
     delete user.password;
-    return {user, accessToken};
+    return { user, accessToken };
   } else {
     return Promise.reject({
       status: 401,
