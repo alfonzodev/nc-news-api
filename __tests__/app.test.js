@@ -64,6 +64,26 @@ describe("/api/topics", () => {
   });
 });
 
+describe("/api/gallery", () => {
+  describe("GET", () => {
+    test("200: responds with an array of all image objects", () => {
+      return request(app)
+        .get("/api/gallery")
+        .expect(200)
+        .then(({ body }) => {
+          const { images } = body;
+          expect(images.length).toBe(2);
+          images.forEach((image) => {
+            expect(image).toMatchObject({
+              img_id: expect.any(Number),
+              img_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("/api/users", () => {
   describe("GET", () => {
     test("200: responds with an array of user objects", () => {
