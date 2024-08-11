@@ -84,6 +84,26 @@ describe("/api/gallery", () => {
   });
 });
 
+describe("/api/avatars", () => {
+  describe("GET", () => {
+    test("200: responds with an array of all avatar objects", () => {
+      return request(app)
+        .get("/api/avatars")
+        .expect(200)
+        .then(({ body }) => {
+          const { avatars } = body;
+          expect(avatars.length).toBe(4);
+          avatars.forEach((avatar) => {
+            expect(avatar).toMatchObject({
+              avatar_id: expect.any(Number),
+              avatar_img_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("/api/users", () => {
   describe("GET", () => {
     test("200: responds with an array of user objects", () => {
