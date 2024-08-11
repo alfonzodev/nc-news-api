@@ -416,6 +416,7 @@ describe("/api/articles", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               img_id: expect.any(Number),
+              img_url: expect.any(String),
               comment_count: expect.any(String),
             });
           });
@@ -948,6 +949,7 @@ describe("/api/my-articles", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               img_id: expect.any(Number),
+              img_url: expect.any(String),
             });
           });
         });
@@ -972,6 +974,8 @@ describe("/api/articles/:article_id", () => {
             created_at: "2020-07-09T20:11:00.000Z",
             votes: 100,
             img_id: 1,
+            img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           });
         });
     });
@@ -984,6 +988,7 @@ describe("/api/articles/:article_id", () => {
           expect(article).toEqual(expect.objectContaining({ comment_count: "11" }));
         });
     });
+
     test("404: responds with Not Found when article id does not exist", () => {
       return request(app)
         .get("/api/articles/9999")
