@@ -1,16 +1,52 @@
 {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "Serves a json representation of all the available API endpoints."
   },
   "GET /api/topics": {
-    "description": "serves an array of all topics",
+    "description": "Returns an array of all topics.",
     "queries": [],
     "exampleResponse": {
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "GET /api/gallery": {
+    "description": "Returns an array of all gallery images.",
+    "queries": [],
+    "exampleResponse": {
+      "images": [
+        {
+          "img_id": 1,
+          "img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+        },
+        {
+          "img_id": 2,
+          "img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80"
+        }
+      ]
+    }
+  },
+  "GET /api/avatars": {
+    "description": "Returns an array of all avatar images",
+    "queries": [],
+    "exampleResponse": {
+      "avatars": [
+        {
+          "avatar_id": 1,
+          "avatar_img_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "avatar_id": 2,
+          "avatar_img_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        },
+        {
+          "avatar_id": 3,
+          "avatar_img_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
+    "description": "Returns an array of all articles with optional filters by `author`, `topic`, `sort_by` and `order`.",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
@@ -29,7 +65,7 @@
     }
   },
   "POST /api/articles": {
-    "description": "creates a new article",
+    "description": "Creates a new article.",
     "exampleRequestBody": {
       "author": "butter_bridge",
       "title": "Cats are cute",
@@ -38,23 +74,21 @@
       "article_img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80"
     },
     "exampleResponse": {
-      "article": [
-        {
-          "article_id": 2,
-          "author": "butter_bridge",
-          "title": "Cats are cute",
-          "body": "Cats are extremely cute.",
-          "topic": "cats",
-          "article_img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
-          "votes": 0,
-          "created_at": 1527695974432,
-          "comment_count": 0
-        }
-      ]
+      "article": {
+        "article_id": 2,
+        "author": "butter_bridge",
+        "title": "Cats are cute",
+        "body": "Cats are extremely cute.",
+        "topic": "cats",
+        "article_img_url": "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        "votes": 0,
+        "created_at": 1527695974432,
+        "comment_count": 0
+      }
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an article by id",
+    "description": "Returns an article by id.",
     "queries": [],
     "exampleResponse": {
       "article": {
@@ -71,7 +105,7 @@
     }
   },
   "PATCH /api/articles/:article_id": {
-    "description": "increments/decrements article votes by amount defined in passed object",
+    "description": "Increments or decrements article votes by amount defined in passed object.",
     "exampleRequestBody": { "inc_votes": -10 },
     "exampleResponse": {
       "article": {
@@ -87,7 +121,7 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of comments for the specified article ordered by creation date",
+    "description": "Returns an array of comments for the specified article, ordered by creation date.",
     "queries": [],
     "exampleResponse": {
       "comments": [
@@ -111,7 +145,7 @@
     }
   },
   "POST /api/articles/:article_id/comments": {
-    "description": "creates new comment",
+    "description": "Creates a new comment for the specified article.",
     "exampleRequestBody": {
       "username": "king_of_comments",
       "body": "This is a new comment!"
@@ -128,7 +162,7 @@
     }
   },
   "PATCH /api/comments/:comment_id": {
-    "description": "increments/decrements comment votes by amount defined in passed object",
+    "description": "Increments or decrements comment votes by amount defined in passed object.",
     "exampleRequestBody": { "inc_votes": 10 },
     "exampleResponse": {
       "updatedComment": {
@@ -142,11 +176,11 @@
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "deletes comment by id",
+    "description": "Deletes a comment by id.",
     "exampleResponse": {}
   },
   "GET /api/users": {
-    "description": "serves an array of all users",
+    "description": "Returns an array of all users.",
     "queries": [],
     "exampleResponse": {
       "users": [
@@ -154,63 +188,72 @@
           "username": "weegembump",
           "name": "jonny",
           "email": "jonny@email.com",
-          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+          "avatar_id": 1,
+          "avatar_img_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         },
         {
           "username": "king_of_comments",
           "name": "Anthony",
           "email": "anthony@email.com",
-          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+          "avatar_id": 2,
+          "avatar_img_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
         },
         {
           "username": "solitary_reader",
           "name": "Emma",
           "email": "emma@email.com",
-          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+          "avatar_id": 3,
+          "avatar_img_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
         }
       ]
     }
   },
   "POST /api/users/register": {
-    "description": "registers a new user",
+    "description": "Registers a new user.",
     "exampleRequestBody": {
       "name": "jonny",
       "username": "wegembump",
       "email": "jonny@email.com",
       "password": "jonny123#",
-      "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      "avatar_id": 1
     },
     "exampleResponse": {
       "user": {
-          "username": "weegembump",
-          "name": "jonny",
-          "email": "jonny@email.com",
-          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-        }
+        "username": "weegembump",
+        "name": "jonny",
+        "email": "jonny@email.com",
+        "avatar_id": 1,
+        "avatar_img_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      }
     }
   },
   "POST /api/users/login": {
-    "description": "logins user",
+    "description": "Authenticates a user.",
     "exampleRequestBody": {
       "email": "jonny@email.com",
       "password": "jonny123#"
     },
     "exampleResponse": {
-      "msg": "Success: Login successful!"
+      "user": {
+        "username": "weegembump",
+        "name": "jonny",
+        "email": "jonny@email.com",
+        "avatar_id": 1,
+        "avatar_img_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      }
     }
   },
   "GET /api/users/:username": {
-    "description": "serves a user object",
+    "description": "Returns a user object by username.",
     "queries": [],
     "exampleResponse": {
-      "user": [
-        {
-          "username": "weegembump",
-          "name": "jonny",
-          "email": "jonny@email.com",
-          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-        }
-      ]
+      "user": {
+        "username": "weegembump",
+        "name": "jonny",
+        "email": "jonny@email.com",
+        "avatar_id": 1,
+        "avatar_img_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      }
     }
   }
 }
