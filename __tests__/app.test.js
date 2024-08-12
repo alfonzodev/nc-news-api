@@ -113,12 +113,14 @@ describe("/api/users", () => {
         .then(({ body }) => {
           const { users } = body;
           expect(users.length).toBe(4);
+
           users.forEach((user) => {
             expect(user).toMatchObject({
               username: expect.any(String),
               name: expect.any(String),
               email: expect.any(String),
               avatar_id: expect.any(Number),
+              avatar_img_url: expect.any(String),
             });
           });
         });
@@ -148,6 +150,7 @@ describe("/api/users/register", () => {
             name: "Test User",
             email: "test@email.com",
             avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
@@ -170,6 +173,7 @@ describe("/api/users/register", () => {
             name: "Test User",
             email: "test@email.com",
             avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
@@ -292,6 +296,7 @@ describe("/api/users/login", () => {
             username: "butter_bridge",
             name: "jonny",
             avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
             email: "jonny@email.com",
           });
         });
@@ -378,6 +383,7 @@ describe("/api/users/:username", () => {
             name: "jonny",
             email: "jonny@email.com",
             avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
