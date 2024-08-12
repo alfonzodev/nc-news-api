@@ -1,8 +1,8 @@
 # Northcoders News API
 
-An Express api for an articles website developed with Test Driven Development. 
+An Express api for an articles website developed with Test Driven Development.
 <br><br>
-**live version** - https://top-tier-articles.onrender.com/api
+**Live Version** - [https://top-tier-articles.onrender.com/api](https://top-tier-articles.onrender.com/api)
 
 ## Features
 
@@ -15,42 +15,77 @@ An Express api for an articles website developed with Test Driven Development.
 - Upvote/Downvote articles
 - Upvote/Downvote comments
 
-
 ## Technologies Used
 
 - NodeJS
 - ExpressJS
 - PostgreSQL
 
-## Required Programs
+## Prerequisites
 
+- [PostgreSQL 15+](https://www.postgresql.org/download/) installed on your local machine.
+  - `psql` command-line tool should be accessible from your terminal.
 - [NodeJS 18.15.0 LTS +](https://nodejs.org/en)<br>
-- [PostgreSQL 15+](https://www.postgresql.org/download/)
 
-## Installation Guide
+## Setup
 
-- Clone this repository.
-- Run **npm install** to install all dependencies;
-- Create the .env files in your project root folder (see .env-example for reference):
-  - **_.env.development_** - to contain a variable with dev database name and a variable with jwt token secret
-  - **_.env.test_** - to contain a variable with test database name and a variable with jwt token secret
-- Run **npm run setup-dbs** to create the databases
-- Run **npm run seed** to seed the dev database
+1. **Install PostgreSQL**:
+
+   - Download and install PostgreSQL from the [official site](https://www.postgresql.org/download/).
+   - Ensure the `psql` command-line tool is available in your system PATH.
+
+2. **Setup the Database**:
+
+   - Run the following command to set up your databases:
+     ```bash
+     npm run setup-dbs
+     ```
+
+3. **Create `.env` Files**:
+
+   - In your project root folder, create the following files:
+     - **`.env.development`**: Set `PGDATABASE` to `nc_news` and `JWT_TOKEN_SECRET` to your chosen secret.
+     - **`.env.test`**: Set `PGDATABASE` to `nc_news_test` and `JWT_TOKEN_SECRET` to your chosen secret.
+
+4. **Seed the Database**:
+
+   - Seed your database with initial data:
+     ```bash
+     npm run seed
+     ```
+
+5. **Start the Application**:
+   - Start the server:
+     ```bash
+     npm start
+     ```
 
 ## Testing
 
-- Run **npm test** (the seeding of the test database is done automatically when testing)
+- Run tests with:
+  ```bash
+  npm test
+  ```
+  (The seeding of the test database is done automatically when testing.)
 
 ## Usage
 
-- Run **npm start** to start the application.
+- Run the application with:
+
+  ```bash
+  npm start
+  ```
+
 - Connect to the API using your preferred API Client on port 9090 (Don't have an API client? Check [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/download)).
 
 ### Authentication
 
 This api supports email and password authentication, and authorization with JWT's.
 
-**Note:** If you want to test the login functionality with the existing dummy users data, the unhashed passwords are 'test123#' (e.g., email: 'tomtickle@email.com', password: 'test123#').
+**Note:** For testing login functionality with the existing dummy user data, use the unhashed password 'test123#'. For example:
+
+- Email: `tomtickle@email.com`
+- Password: `test123#`
 
 ### API Endpoints
 

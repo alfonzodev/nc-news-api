@@ -6,18 +6,14 @@ const seed = require("../db/seeds/seed");
 const jwt = require("jsonwebtoken");
 
 // Sing token with existing username
-const validUsernameToken = jwt.sign(
-  { username: "butter_bridge" },
-  process.env.JWT_TOKEN_SECRET,
-  { expiresIn: 60 }
-);
+const validUsernameToken = jwt.sign({ username: "butter_bridge" }, process.env.JWT_TOKEN_SECRET, {
+  expiresIn: 60,
+});
 
 // Sign token with fake username
-const invalidUsernameToken = jwt.sign(
-  { username: "fake_user" },
-  process.env.JWT_TOKEN_SECRET,
-  { expiresIn: 60 }
-);
+const invalidUsernameToken = jwt.sign({ username: "fake_user" }, process.env.JWT_TOKEN_SECRET, {
+  expiresIn: 60,
+});
 
 let validToken = "";
 let invalidToken = "";
@@ -68,6 +64,46 @@ describe("/api/topics", () => {
   });
 });
 
+describe("/api/gallery", () => {
+  describe("GET", () => {
+    test("200: responds with an array of all image objects", () => {
+      return request(app)
+        .get("/api/gallery")
+        .expect(200)
+        .then(({ body }) => {
+          const { images } = body;
+          expect(images.length).toBe(2);
+          images.forEach((image) => {
+            expect(image).toMatchObject({
+              img_id: expect.any(Number),
+              img_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
+describe("/api/avatars", () => {
+  describe("GET", () => {
+    test("200: responds with an array of all avatar objects", () => {
+      return request(app)
+        .get("/api/avatars")
+        .expect(200)
+        .then(({ body }) => {
+          const { avatars } = body;
+          expect(avatars.length).toBe(4);
+          avatars.forEach((avatar) => {
+            expect(avatar).toMatchObject({
+              avatar_id: expect.any(Number),
+              avatar_img_url: expect.any(String),
+            });
+          });
+        });
+    });
+  });
+});
+
 describe("/api/users", () => {
   describe("GET", () => {
     test("200: responds with an array of user objects", () => {
@@ -77,12 +113,14 @@ describe("/api/users", () => {
         .then(({ body }) => {
           const { users } = body;
           expect(users.length).toBe(4);
+
           users.forEach((user) => {
             expect(user).toMatchObject({
               username: expect.any(String),
               name: expect.any(String),
               email: expect.any(String),
-              avatar_url: expect.any(String),
+              avatar_id: expect.any(Number),
+              avatar_img_url: expect.any(String),
             });
           });
         });
@@ -98,8 +136,7 @@ describe("/api/users/register", () => {
         name: "Test User",
         email: "test@email.com",
         password: "test123#",
-        avatar_url:
-          "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+        avatar_id: 1,
       };
 
       return request(app)
@@ -112,12 +149,12 @@ describe("/api/users/register", () => {
             username: "test_username",
             name: "Test User",
             email: "test@email.com",
-            avatar_url:
-              "https://vignette.wikia.nocookie.net/mrmen/images/7/78/Mr-Grumpy-3A.PNG/revision/latest?cb=20170707233013",
+            avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
-    test("201: accepts user object with no avatar_url and creates user with default avatar_url", () => {
+    test("201: accepts user object with no avatar_id and creates user with default avatar_id", () => {
       const newUser = {
         username: "test_username",
         name: "Test User",
@@ -135,8 +172,8 @@ describe("/api/users/register", () => {
             username: "test_username",
             name: "Test User",
             email: "test@email.com",
-            avatar_url:
-              "https://vignette1.wikia.nocookie.net/mrmen/images/7/7f/Mr_Happy.jpg/revision/latest?cb=20140102171729",
+            avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
@@ -258,8 +295,8 @@ describe("/api/users/login", () => {
           expect(user).toMatchObject({
             username: "butter_bridge",
             name: "jonny",
-            avatar_url:
-              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
             email: "jonny@email.com",
           });
         });
@@ -345,8 +382,8 @@ describe("/api/users/:username", () => {
             username: "butter_bridge",
             name: "jonny",
             email: "jonny@email.com",
-            avatar_url:
-              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+            avatar_id: 1,
+            avatar_img_url: "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
           });
         });
     });
@@ -384,7 +421,8 @@ describe("/api/articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
+              img_url: expect.any(String),
               comment_count: expect.any(String),
             });
           });
@@ -435,7 +473,7 @@ describe("/api/articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
               comment_count: expect.any(String),
             });
           });
@@ -462,7 +500,7 @@ describe("/api/articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
               comment_count: expect.any(String),
             });
           });
@@ -489,7 +527,7 @@ describe("/api/articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
               comment_count: expect.any(String),
             });
           });
@@ -516,7 +554,7 @@ describe("/api/articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
               comment_count: expect.any(String),
             });
           });
@@ -580,7 +618,7 @@ describe("/api/articles", () => {
                 topic: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
-                article_img_url: expect.any(String),
+                img_id: expect.any(Number),
                 comment_count: expect.any(String),
               });
             });
@@ -606,7 +644,7 @@ describe("/api/articles", () => {
                 topic: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
-                article_img_url: expect.any(String),
+                img_id: expect.any(Number),
                 comment_count: expect.any(String),
               });
             });
@@ -632,7 +670,7 @@ describe("/api/articles", () => {
                 topic: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
-                article_img_url: expect.any(String),
+                img_id: expect.any(Number),
                 comment_count: expect.any(String),
               });
             });
@@ -658,7 +696,7 @@ describe("/api/articles", () => {
                 topic: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
-                article_img_url: expect.any(String),
+                img_id: expect.any(Number),
                 comment_count: expect.any(String),
               });
             });
@@ -702,8 +740,7 @@ describe("/api/articles", () => {
         title: "Cats are cute",
         body: "Cats are extremely cute.",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -718,8 +755,7 @@ describe("/api/articles", () => {
             title: "Cats are cute",
             body: "Cats are extremely cute.",
             topic: "cats",
-            article_img_url:
-              "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+            img_id: 2,
             votes: 0,
             created_at: expect.any(String),
             comment_count: 0,
@@ -746,8 +782,7 @@ describe("/api/articles", () => {
             title: "Cats are cute",
             body: "Cats are extremely cute.",
             topic: "cats",
-            article_img_url:
-              "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700",
+            img_id: 1,
             votes: 0,
             created_at: expect.any(String),
             comment_count: 0,
@@ -760,8 +795,7 @@ describe("/api/articles", () => {
         title: "Cats are cute",
         body: "Cats are extremely cute.",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -779,8 +813,7 @@ describe("/api/articles", () => {
         title: "Cats are cute",
         body: "Cats are extremely cute.",
         topic: "fake-topic",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -798,8 +831,7 @@ describe("/api/articles", () => {
         title: "",
         body: "Cats are extremely cute.",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -817,8 +849,7 @@ describe("/api/articles", () => {
         title: "Cats are cute",
         body: "",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -835,8 +866,7 @@ describe("/api/articles", () => {
         author: "butter_bridge",
         body: "Cats are extremely cute.",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -853,8 +883,7 @@ describe("/api/articles", () => {
         author: "butter_bridge",
         title: "Cats are cute",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -871,8 +900,7 @@ describe("/api/articles", () => {
         author: "butter_bridge",
         title: "Cats are cute",
         body: "Cats are extremely cute.",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -889,8 +917,7 @@ describe("/api/articles", () => {
         title: "Cats are cute",
         body: "Cats are extremely cute.",
         topic: "cats",
-        article_img_url:
-          "https://images.unsplash.com/photo-1561948955-570b270e7c36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=601&q=80",
+        img_id: 2,
       };
       return request(app)
         .post("/api/articles")
@@ -927,7 +954,8 @@ describe("/api/my-articles", () => {
               body: expect.any(String),
               created_at: expect.any(String),
               votes: expect.any(Number),
-              article_img_url: expect.any(String),
+              img_id: expect.any(Number),
+              img_url: expect.any(String),
             });
           });
         });
@@ -951,7 +979,8 @@ describe("/api/articles/:article_id", () => {
             topic: "mitch",
             created_at: "2020-07-09T20:11:00.000Z",
             votes: 100,
-            article_img_url:
+            img_id: 1,
+            img_url:
               "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           });
         });
@@ -962,11 +991,10 @@ describe("/api/articles/:article_id", () => {
         .expect(200)
         .then(({ body }) => {
           const { article } = body;
-          expect(article).toEqual(
-            expect.objectContaining({ comment_count: "11" })
-          );
+          expect(article).toEqual(expect.objectContaining({ comment_count: "11" }));
         });
     });
+
     test("404: responds with Not Found when article id does not exist", () => {
       return request(app)
         .get("/api/articles/9999")
@@ -1013,8 +1041,7 @@ describe("/api/articles/:article_id", () => {
             body: "I find this existence challenging",
             created_at: expect.any(String),
             votes: 110,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            img_id: 1,
           });
         });
     });
@@ -1035,8 +1062,7 @@ describe("/api/articles/:article_id", () => {
             body: "I find this existence challenging",
             created_at: expect.any(String),
             votes: 90,
-            article_img_url:
-              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            img_id: 1,
           });
         });
     });
@@ -1164,9 +1190,7 @@ describe("/api/comments/:comment_id", () => {
         .expect(401)
         .then(({ body }) => {
           const { msg } = body;
-          expect(msg).toBe(
-            "Error: Unauthorized - user is not author of comment."
-          );
+          expect(msg).toBe("Error: Unauthorized - user is not author of comment.");
         });
     });
   });

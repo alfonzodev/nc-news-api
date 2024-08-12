@@ -3,13 +3,30 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const fetchUsers = () => {
-  return db.query("SELECT username, name, email, avatar_url FROM users");
+  return db.query(
+    `SELECT
+        users.username,
+        users.name,
+        users.email,
+        users.avatar_id,
+        avatars.avatar_img_url AS avatar_img_url
+     FROM users
+     LEFT JOIN avatars ON users.avatar_id = avatars.avatar_id`
+  );
 };
 
 const fetchUserByUsername = (username) => {
   return db
     .query(
-      "SELECT username, name, email, avatar_url FROM users WHERE username = $1",
+      `SELECT
+         users.username,
+         users.name,
+         users.email,
+         users.avatar_id,
+         avatars.avatar_img_url AS avatar_img_url
+       FROM users
+       LEFT JOIN avatars ON users.avatar_id = avatars.avatar_id
+       WHERE users.username = $1`,
       [username]
     )
     .then((data) => {
@@ -24,28 +41,31 @@ const fetchUserByUsername = (username) => {
     });
 };
 
-const createUser = async ({ username, name, email, password, avatar_url }) => {
-  const queryParams = [username, name, email];
-  let queryStr = "INSERT INTO users";
+const createUser = async ({ username, name, email, password, avatar_id }) => {
+  if (!password) return Promise.reject({ status: 400, msg: "Error: missing information." });
 
-  if (password) {
-    const hashedPwd = await bcrypt.hash(password, 10);
-    queryParams.push(hashedPwd);
-  } else {
-    return Promise.reject({ status: 400, msg: "Error: missing information." });
-  }
+  // Hash Password
+  let hashedPwd = await bcrypt.hash(password, 10);
 
-  if (!avatar_url) {
-    queryStr += "(username, name, email, password) VALUES($1, $2, $3, $4)";
-  } else if (avatar_url) {
-    queryStr +=
-      "(username, name, email, password, avatar_url) VALUES($1, $2, $3, $4, $5)";
-    queryParams.push(avatar_url);
-  }
-  queryStr += "RETURNING username, name, email, avatar_url";
+  const queryParams = [username, name, email, hashedPwd, avatar_id];
 
-  const response =  await db.query(queryStr, queryParams);
+  let queryStr = `
+    WITH inserted_user AS (
+      INSERT INTO users (username, name, email, password, avatar_id)
+      VALUES ($1, $2, $3, $4, COALESCE($5, 1 )) -- Use COALESCE to handle optional avatar_id
+      RETURNING username, name, email, avatar_id
+    )
+    SELECT
+      inserted_user.username,
+      inserted_user.name,
+      inserted_user.email,
+      inserted_user.avatar_id,
+      avatars.avatar_img_url
+    FROM inserted_user
+    LEFT JOIN avatars ON inserted_user.avatar_id = avatars.avatar_id;
+  `;
 
+  const response = await db.query(queryStr, queryParams);
   const user = response.rows[0];
 
   // Generate an access token with 1d of expiration
@@ -53,7 +73,7 @@ const createUser = async ({ username, name, email, password, avatar_url }) => {
     expiresIn: "1d",
   });
 
-  return {user, accessToken};
+  return { user, accessToken };
 };
 
 const authenticateUser = async ({ email, password }) => {
@@ -64,16 +84,31 @@ const authenticateUser = async ({ email, password }) => {
     });
   }
 
-  const findUser = await db.query("SELECT * FROM users WHERE email = $1", [
-    email,
-  ]);
-  if (findUser.rowCount === 0) {
+  const selectUserResponse = await db.query(
+    `
+    SELECT 
+      users.username, 
+      users.name, 
+      users.email, 
+      users.password, 
+      users.avatar_id,
+      avatars.avatar_img_url
+    FROM users
+    LEFT JOIN avatars on users.avatar_id = avatars.avatar_id
+    WHERE email = $1;
+    `,
+    [email]
+  );
+
+  // Check for empty response
+  if (selectUserResponse.rowCount === 0) {
     return Promise.reject({
       status: 404,
       msg: "Not Found: email does not exist.",
     });
   }
-  const user = findUser.rows[0];
+
+  const user = selectUserResponse.rows[0];
 
   const match = await bcrypt.compare(password, user.password);
   if (match) {
@@ -85,7 +120,7 @@ const authenticateUser = async ({ email, password }) => {
     });
 
     delete user.password;
-    return {user, accessToken};
+    return { user, accessToken };
   } else {
     return Promise.reject({
       status: 401,
